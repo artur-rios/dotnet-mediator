@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dotnet Mediator</title><link>https://artur-rios.github.io/dotnet-mediator/</link><description>Recent content on Dotnet Mediator</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://artur-rios.github.io/dotnet-mediator/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://artur-rios.github.io/dotnet-mediator/command-architecture/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://artur-rios.github.io/dotnet-mediator/command-architecture/</guid><description>&lt;h1 id="command-architecture"&gt;Command Architecture&lt;/h1&gt;
+&lt;p&gt;Commands represent &lt;strong&gt;write intents&lt;/strong&gt; — creating, updating, or deleting state. The command side of &lt;code&gt;ArturRios.Mediator&lt;/code&gt; enforces a strict one-command-one-handler rule and isolates each execution in its own DI scope.&lt;/p&gt;
+&lt;h2 id="core-types"&gt;Core Types&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Type&lt;/th&gt;
+&lt;th&gt;Purpose&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;BaseCommand&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for all command data carriers&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;CommandOutput&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for the result payload&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;ICommandHandler&amp;lt;TCommand, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Synchronous handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;ICommandHandlerAsync&amp;lt;TCommand, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Asynchronous handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;CommandMediator&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Resolves and invokes the registered handler&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="basecommand"&gt;BaseCommand&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;abstract&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;BaseCommand&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Derive from &lt;code&gt;BaseCommand&lt;/code&gt; to create a command. Expose the data the handler needs as plain properties. Commands are simple data carriers — no business logic belongs here.&lt;/p&gt;</description><content>&lt;h1 id="command-architecture"&gt;Command Architecture&lt;/h1&gt;
+&lt;p&gt;Commands represent &lt;strong&gt;write intents&lt;/strong&gt; — creating, updating, or deleting state. The command side of &lt;code&gt;ArturRios.Mediator&lt;/code&gt; enforces a strict one-command-one-handler rule and isolates each execution in its own DI scope.&lt;/p&gt;
+&lt;h2 id="core-types"&gt;Core Types&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Type&lt;/th&gt;
+&lt;th&gt;Purpose&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;BaseCommand&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for all command data carriers&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;CommandOutput&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for the result payload&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;ICommandHandler&amp;lt;TCommand, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Synchronous handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;ICommandHandlerAsync&amp;lt;TCommand, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Asynchronous handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;CommandMediator&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Resolves and invokes the registered handler&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="basecommand"&gt;BaseCommand&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;abstract&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;BaseCommand&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Derive from &lt;code&gt;BaseCommand&lt;/code&gt; to create a command. Expose the data the handler needs as plain properties. Commands are simple data carriers — no business logic belongs here.&lt;/p&gt;
+&lt;h3 id="commandoutput"&gt;CommandOutput&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;abstract&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;CommandOutput&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Derive from &lt;code&gt;CommandOutput&lt;/code&gt; to describe the result of a command (for example, the identifier of the newly created entity). The mediator wraps it in &lt;code&gt;DataOutput&amp;lt;TOutput?&amp;gt;&lt;/code&gt; before returning it to the caller.&lt;/p&gt;
+&lt;h3 id="icommandhandler"&gt;ICommandHandler&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;interface&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ICommandHandler&lt;/span&gt;&amp;lt;&lt;span style="color:#66d9ef"&gt;in&lt;/span&gt; TCommand, TOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TCommand : BaseCommand
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TOutput : CommandOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; DataOutput&amp;lt;TOutput?&amp;gt; Handle(TCommand command);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Implement for synchronous execution. Register &lt;strong&gt;one&lt;/strong&gt; implementation per &lt;code&gt;&amp;lt;TCommand, TOutput&amp;gt;&lt;/code&gt; pair in the DI container.&lt;/p&gt;
+&lt;h3 id="icommandhandlerasync"&gt;ICommandHandlerAsync&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;interface&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ICommandHandlerAsync&lt;/span&gt;&amp;lt;&lt;span style="color:#66d9ef"&gt;in&lt;/span&gt; TCommand, TOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TCommand : BaseCommand
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TOutput : CommandOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Task&amp;lt;DataOutput&amp;lt;TOutput?&amp;gt;&amp;gt; HandleAsync(TCommand command);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Implement for asynchronous execution. Register &lt;strong&gt;one&lt;/strong&gt; implementation per &lt;code&gt;&amp;lt;TCommand, TOutput&amp;gt;&lt;/code&gt; pair in the DI container.&lt;/p&gt;
+&lt;h3 id="commandmediator"&gt;CommandMediator&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;CommandMediator&lt;/span&gt;(IServiceScopeFactory scopeFactory)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; DataOutput&amp;lt;TOutput?&amp;gt; ExecuteCommand &amp;lt;TCommand, TOutput&amp;gt;(TCommand command) ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; Task&amp;lt;DataOutput&amp;lt;TOutput?&amp;gt;&amp;gt; ExecuteCommandAsync&amp;lt;TCommand, TOutput&amp;gt;(TCommand command) ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope. This ensures scoped dependencies (e.g. &lt;code&gt;DbContext&lt;/code&gt;) are isolated per command execution.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="class-diagram"&gt;Class Diagram&lt;/h2&gt;
+&lt;pre class="mermaid"&gt;classDiagram
+direction TB
+class BaseCommand {
+&amp;lt;&amp;lt;abstract&amp;gt;&amp;gt;
+}
+class CommandOutput {
+&amp;lt;&amp;lt;abstract&amp;gt;&amp;gt;
+}
+class ICommandHandler~TCommand TOutput~ {
+&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;
++Handle(command TCommand) DataOutput~TOutput?~
+}
+class ICommandHandlerAsync~TCommand TOutput~ {
+&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;
++HandleAsync(command TCommand) Task~DataOutput~TOutput?~~
+}
+class CommandMediator {
+-IServiceScopeFactory _scopeFactory
++ExecuteCommand(command TCommand) DataOutput~TOutput?~
++ExecuteCommandAsync(command TCommand) Task~DataOutput~TOutput?~~
+}
+class CommandQueryMediator {
+-CommandMediator _commandMediator
+-QueryMediator _queryMediator
++ExecuteCommand(command TCommand) DataOutput~TOutput?~
++ExecuteCommandAsync(command TCommand) Task~DataOutput~TOutput?~~
+}
+ICommandHandler~TCommand TOutput~ ..&amp;gt; BaseCommand : constrains TCommand
+ICommandHandler~TCommand TOutput~ ..&amp;gt; CommandOutput : constrains TOutput
+ICommandHandlerAsync~TCommand TOutput~ ..&amp;gt; BaseCommand : constrains TCommand
+ICommandHandlerAsync~TCommand TOutput~ ..&amp;gt; CommandOutput : constrains TOutput
+CommandMediator --&amp;gt; ICommandHandler~TCommand TOutput~ : resolves &amp;amp; invokes
+CommandMediator --&amp;gt; ICommandHandlerAsync~TCommand TOutput~ : resolves &amp;amp; invokes
+CommandQueryMediator --&amp;gt; CommandMediator : delegates to
+&lt;/pre&gt;
+&lt;hr&gt;
+&lt;h2 id="sequence-diagrams"&gt;Sequence Diagrams&lt;/h2&gt;
+&lt;h3 id="synchronous-command-execution"&gt;Synchronous Command Execution&lt;/h3&gt;
+&lt;pre class="mermaid"&gt;sequenceDiagram
+participant Caller
+participant CommandMediator
+participant DI as DI Container (scope)
+participant Handler as ICommandHandler
+Caller-&amp;gt;&amp;gt;CommandMediator: ExecuteCommand&amp;lt;TCommand, TOutput&amp;gt;(command)
+CommandMediator-&amp;gt;&amp;gt;DI: CreateScope()
+CommandMediator-&amp;gt;&amp;gt;DI: GetRequiredService&amp;lt;ICommandHandler&amp;lt;TCommand, TOutput&amp;gt;&amp;gt;()
+DI--&amp;gt;&amp;gt;CommandMediator: handler
+CommandMediator-&amp;gt;&amp;gt;Handler: Handle(command)
+Handler--&amp;gt;&amp;gt;CommandMediator: DataOutput&amp;lt;TOutput?&amp;gt;
+CommandMediator-&amp;gt;&amp;gt;DI: Dispose scope
+CommandMediator--&amp;gt;&amp;gt;Caller: DataOutput&amp;lt;TOutput?&amp;gt;
+&lt;/pre&gt;
+&lt;h3 id="asynchronous-command-execution"&gt;Asynchronous Command Execution&lt;/h3&gt;
+&lt;pre class="mermaid"&gt;sequenceDiagram
+participant Caller
+participant CommandMediator
+participant DI as DI Container (scope)
+participant Handler as ICommandHandlerAsync
+Caller-&amp;gt;&amp;gt;CommandMediator: ExecuteCommandAsync&amp;lt;TCommand, TOutput&amp;gt;(command)
+CommandMediator-&amp;gt;&amp;gt;DI: CreateScope()
+CommandMediator-&amp;gt;&amp;gt;DI: GetRequiredService&amp;lt;ICommandHandlerAsync&amp;lt;TCommand, TOutput&amp;gt;&amp;gt;()
+DI--&amp;gt;&amp;gt;CommandMediator: handler
+CommandMediator-&amp;gt;&amp;gt;Handler: HandleAsync(command)
+Handler--&amp;gt;&amp;gt;CommandMediator: Task&amp;lt;DataOutput&amp;lt;TOutput?&amp;gt;&amp;gt;
+CommandMediator-&amp;gt;&amp;gt;DI: Dispose scope
+CommandMediator--&amp;gt;&amp;gt;Caller: DataOutput&amp;lt;TOutput?&amp;gt;
+&lt;/pre&gt;
+&lt;hr&gt;
+&lt;h2 id="usage-example"&gt;Usage Example&lt;/h2&gt;
+&lt;h3 id="define-the-command-and-output"&gt;Define the command and output&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;CreateProductCommand&lt;/span&gt; : BaseCommand
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;string&lt;/span&gt; Name { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; } = &lt;span style="color:#66d9ef"&gt;string&lt;/span&gt;.Empty;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;decimal&lt;/span&gt; Price { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;CreateProductOutput&lt;/span&gt; : CommandOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; Guid Id { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="implement-the-handler"&gt;Implement the handler&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;CreateProductHandler&lt;/span&gt; : ICommandHandlerAsync&amp;lt;CreateProductCommand, CreateProductOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;private&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;readonly&lt;/span&gt; IProductRepository _repository;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; CreateProductHandler(IProductRepository repository) =&amp;gt; _repository = repository;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;async&lt;/span&gt; Task&amp;lt;DataOutput&amp;lt;CreateProductOutput?&amp;gt;&amp;gt; HandleAsync(CreateProductCommand command)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; id = &lt;span style="color:#66d9ef"&gt;await&lt;/span&gt; _repository.InsertAsync(command.Name, command.Price);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; DataOutput&amp;lt;CreateProductOutput?&amp;gt;.Success(&lt;span style="color:#66d9ef"&gt;new&lt;/span&gt; CreateProductOutput { Id = id });
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="register-in-di"&gt;Register in DI&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;builder.Services.AddSingleton&amp;lt;CommandMediator&amp;gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;builder.Services.AddScoped&amp;lt;ICommandHandlerAsync&amp;lt;CreateProductCommand, CreateProductOutput&amp;gt;, CreateProductHandler&amp;gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="dispatch"&gt;Dispatch&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; result = &lt;span style="color:#66d9ef"&gt;await&lt;/span&gt; mediator.ExecuteCommandAsync&amp;lt;CreateProductCommand, CreateProductOutput&amp;gt;(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;new&lt;/span&gt; CreateProductCommand { Name = &lt;span style="color:#e6db74"&gt;&amp;#34;Widget&amp;#34;&lt;/span&gt;, Price = &lt;span style="color:#ae81ff"&gt;9.99&lt;/span&gt;m });
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;if&lt;/span&gt; (result.IsSuccess)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Console.WriteLine(&lt;span style="color:#e6db74"&gt;$&amp;#34;Created: {result.Data!.Id}&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;</content></item><item><title/><link>https://artur-rios.github.io/dotnet-mediator/query-architecture/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://artur-rios.github.io/dotnet-mediator/query-architecture/</guid><description>&lt;h1 id="query-architecture"&gt;Query Architecture&lt;/h1&gt;
+&lt;p&gt;Queries represent &lt;strong&gt;read-only requests&lt;/strong&gt; for data. The query side of &lt;code&gt;ArturRios.Mediator&lt;/code&gt; supports two result shapes: a single &lt;code&gt;DataOutput&amp;lt;T&amp;gt;&lt;/code&gt; for item lookups and a &lt;code&gt;PaginatedOutput&amp;lt;T&amp;gt;&lt;/code&gt; for collection queries that need page metadata.&lt;/p&gt;
+&lt;h2 id="core-types"&gt;Core Types&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Type&lt;/th&gt;
+&lt;th&gt;Purpose&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;BaseQuery&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for all query data carriers&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;QueryOutput&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for the result payload&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IQueryHandler&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Synchronous single-result handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IQueryHandlerAsync&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Asynchronous single-result handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IPaginatedQueryHandler&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Synchronous paginated handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IPaginatedQueryHandlerAsync&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Asynchronous paginated handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;QueryMediator&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Resolves and invokes the registered handler&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="basequery"&gt;BaseQuery&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;abstract&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;BaseQuery&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;int&lt;/span&gt; PageNumber { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; } = &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;; &lt;span style="color:#75715e"&gt;// 1-based&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;int&lt;/span&gt; PageSize { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; } = &lt;span style="color:#ae81ff"&gt;100&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Derive from &lt;code&gt;BaseQuery&lt;/code&gt; to create a query. Expose filter criteria as plain properties. The &lt;code&gt;PageNumber&lt;/code&gt; and &lt;code&gt;PageSize&lt;/code&gt; properties are consumed by paginated handlers and ignored by single-result ones.&lt;/p&gt;</description><content>&lt;h1 id="query-architecture"&gt;Query Architecture&lt;/h1&gt;
+&lt;p&gt;Queries represent &lt;strong&gt;read-only requests&lt;/strong&gt; for data. The query side of &lt;code&gt;ArturRios.Mediator&lt;/code&gt; supports two result shapes: a single &lt;code&gt;DataOutput&amp;lt;T&amp;gt;&lt;/code&gt; for item lookups and a &lt;code&gt;PaginatedOutput&amp;lt;T&amp;gt;&lt;/code&gt; for collection queries that need page metadata.&lt;/p&gt;
+&lt;h2 id="core-types"&gt;Core Types&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Type&lt;/th&gt;
+&lt;th&gt;Purpose&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;BaseQuery&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for all query data carriers&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;QueryOutput&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Abstract base class for the result payload&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IQueryHandler&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Synchronous single-result handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IQueryHandlerAsync&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Asynchronous single-result handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IPaginatedQueryHandler&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Synchronous paginated handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;IPaginatedQueryHandlerAsync&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Asynchronous paginated handler contract&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;QueryMediator&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Resolves and invokes the registered handler&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="basequery"&gt;BaseQuery&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;abstract&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;BaseQuery&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;int&lt;/span&gt; PageNumber { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; } = &lt;span style="color:#ae81ff"&gt;1&lt;/span&gt;; &lt;span style="color:#75715e"&gt;// 1-based&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;int&lt;/span&gt; PageSize { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; } = &lt;span style="color:#ae81ff"&gt;100&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Derive from &lt;code&gt;BaseQuery&lt;/code&gt; to create a query. Expose filter criteria as plain properties. The &lt;code&gt;PageNumber&lt;/code&gt; and &lt;code&gt;PageSize&lt;/code&gt; properties are consumed by paginated handlers and ignored by single-result ones.&lt;/p&gt;
+&lt;h3 id="queryoutput"&gt;QueryOutput&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;abstract&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;QueryOutput&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Derive from &lt;code&gt;QueryOutput&lt;/code&gt; to describe the shape of the data returned by a query.&lt;/p&gt;
+&lt;h3 id="iqueryhandler--iqueryhandlerasync"&gt;IQueryHandler / IQueryHandlerAsync&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;interface&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;IQueryHandler&lt;/span&gt;&amp;lt;&lt;span style="color:#66d9ef"&gt;in&lt;/span&gt; TQuery, TOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TQuery : BaseQuery
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TOutput : QueryOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; DataOutput&amp;lt;TOutput?&amp;gt; Handle(TQuery query);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;interface&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;IQueryHandlerAsync&lt;/span&gt;&amp;lt;&lt;span style="color:#66d9ef"&gt;in&lt;/span&gt; TQuery, TOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TQuery : BaseQuery
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TOutput : QueryOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Task&amp;lt;DataOutput&amp;lt;TOutput?&amp;gt;&amp;gt; HandleAsync(TQuery query);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Use for queries that return a &lt;strong&gt;single&lt;/strong&gt; result. Register one implementation per &lt;code&gt;&amp;lt;TQuery, TOutput&amp;gt;&lt;/code&gt; pair.&lt;/p&gt;
+&lt;h3 id="ipaginatedqueryhandler--ipaginatedqueryhandlerasync"&gt;IPaginatedQueryHandler / IPaginatedQueryHandlerAsync&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;interface&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;IPaginatedQueryHandler&lt;/span&gt;&amp;lt;&lt;span style="color:#66d9ef"&gt;in&lt;/span&gt; TQuery, TOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TQuery : BaseQuery
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TOutput : QueryOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; PaginatedOutput&amp;lt;TOutput&amp;gt; Handle(TQuery query);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;interface&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;IPaginatedQueryHandlerAsync&lt;/span&gt;&amp;lt;&lt;span style="color:#66d9ef"&gt;in&lt;/span&gt; TQuery, TOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TQuery : BaseQuery
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;where&lt;/span&gt; TOutput : QueryOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Task&amp;lt;PaginatedOutput&amp;lt;TOutput&amp;gt;&amp;gt; HandleAsync(TQuery query);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Use for queries that return a &lt;strong&gt;page of results&lt;/strong&gt; together with pagination metadata (&lt;code&gt;TotalCount&lt;/code&gt;, &lt;code&gt;TotalPages&lt;/code&gt;, etc. provided by &lt;code&gt;PaginatedOutput&amp;lt;T&amp;gt;&lt;/code&gt;).&lt;/p&gt;
+&lt;h3 id="querymediator"&gt;QueryMediator&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;QueryMediator&lt;/span&gt;(IServiceScopeFactory scopeFactory)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; DataOutput&amp;lt;TOutput?&amp;gt; ExecuteQuery &amp;lt;TQuery, TOutput&amp;gt;(TQuery query) ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; Task&amp;lt;DataOutput&amp;lt;TOutput?&amp;gt;&amp;gt; ExecuteQueryAsync &amp;lt;TQuery, TOutput&amp;gt;(TQuery query) ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; PaginatedOutput&amp;lt;TOutput&amp;gt; ExecutePaginatedQuery &amp;lt;TQuery, TOutput&amp;gt;(TQuery query) ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; Task&amp;lt;PaginatedOutput&amp;lt;TOutput&amp;gt;&amp;gt; ExecutePaginatedQueryAsync&amp;lt;TQuery, TOutput&amp;gt;(TQuery query) ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="class-diagram"&gt;Class Diagram&lt;/h2&gt;
+&lt;pre class="mermaid"&gt;classDiagram
+direction TB
+class BaseQuery {
+&amp;lt;&amp;lt;abstract&amp;gt;&amp;gt;
++PageNumber int
++PageSize int
+}
+class QueryOutput {
+&amp;lt;&amp;lt;abstract&amp;gt;&amp;gt;
+}
+class IQueryHandler~TQuery TOutput~ {
+&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;
++Handle(query TQuery) DataOutput~TOutput?~
+}
+class IQueryHandlerAsync~TQuery TOutput~ {
+&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;
++HandleAsync(query TQuery) Task~DataOutput~TOutput?~~
+}
+class IPaginatedQueryHandler~TQuery TOutput~ {
+&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;
++Handle(query TQuery) PaginatedOutput~TOutput~
+}
+class IPaginatedQueryHandlerAsync~TQuery TOutput~ {
+&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;
++HandleAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+}
+class QueryMediator {
+-IServiceScopeFactory _scopeFactory
++ExecuteQuery(query TQuery) DataOutput~TOutput?~
++ExecuteQueryAsync(query TQuery) Task~DataOutput~TOutput?~~
++ExecutePaginatedQuery(query TQuery) PaginatedOutput~TOutput~
++ExecutePaginatedQueryAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+}
+class CommandQueryMediator {
+-CommandMediator _commandMediator
+-QueryMediator _queryMediator
++ExecuteQuery(query TQuery) DataOutput~TOutput?~
++ExecuteQueryAsync(query TQuery) Task~DataOutput~TOutput?~~
++ExecutePaginatedQuery(query TQuery) PaginatedOutput~TOutput~
++ExecutePaginatedQueryAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+}
+IQueryHandler~TQuery TOutput~ ..&amp;gt; BaseQuery : constrains TQuery
+IQueryHandler~TQuery TOutput~ ..&amp;gt; QueryOutput : constrains TOutput
+IQueryHandlerAsync~TQuery TOutput~ ..&amp;gt; BaseQuery : constrains TQuery
+IQueryHandlerAsync~TQuery TOutput~ ..&amp;gt; QueryOutput : constrains TOutput
+IPaginatedQueryHandler~TQuery TOutput~ ..&amp;gt; BaseQuery : constrains TQuery
+IPaginatedQueryHandler~TQuery TOutput~ ..&amp;gt; QueryOutput : constrains TOutput
+IPaginatedQueryHandlerAsync~TQuery TOutput~ ..&amp;gt; BaseQuery : constrains TQuery
+IPaginatedQueryHandlerAsync~TQuery TOutput~ ..&amp;gt; QueryOutput : constrains TOutput
+QueryMediator --&amp;gt; IQueryHandler~TQuery TOutput~ : resolves &amp;amp; invokes
+QueryMediator --&amp;gt; IQueryHandlerAsync~TQuery TOutput~ : resolves &amp;amp; invokes
+QueryMediator --&amp;gt; IPaginatedQueryHandler~TQuery TOutput~ : resolves &amp;amp; invokes
+QueryMediator --&amp;gt; IPaginatedQueryHandlerAsync~TQuery TOutput~ : resolves &amp;amp; invokes
+CommandQueryMediator --&amp;gt; QueryMediator : delegates to
+&lt;/pre&gt;
+&lt;hr&gt;
+&lt;h2 id="sequence-diagrams"&gt;Sequence Diagrams&lt;/h2&gt;
+&lt;h3 id="single-result-query-asynchronous"&gt;Single-Result Query (Asynchronous)&lt;/h3&gt;
+&lt;pre class="mermaid"&gt;sequenceDiagram
+participant Caller
+participant QueryMediator
+participant DI as DI Container (scope)
+participant Handler as IQueryHandlerAsync
+Caller-&amp;gt;&amp;gt;QueryMediator: ExecuteQueryAsync&amp;lt;TQuery, TOutput&amp;gt;(query)
+QueryMediator-&amp;gt;&amp;gt;DI: CreateScope()
+QueryMediator-&amp;gt;&amp;gt;DI: GetRequiredService&amp;lt;IQueryHandlerAsync&amp;lt;TQuery, TOutput&amp;gt;&amp;gt;()
+DI--&amp;gt;&amp;gt;QueryMediator: handler
+QueryMediator-&amp;gt;&amp;gt;Handler: HandleAsync(query)
+Handler--&amp;gt;&amp;gt;QueryMediator: Task&amp;lt;DataOutput&amp;lt;TOutput?&amp;gt;&amp;gt;
+QueryMediator-&amp;gt;&amp;gt;DI: Dispose scope
+QueryMediator--&amp;gt;&amp;gt;Caller: DataOutput&amp;lt;TOutput?&amp;gt;
+&lt;/pre&gt;
+&lt;h3 id="paginated-query-asynchronous"&gt;Paginated Query (Asynchronous)&lt;/h3&gt;
+&lt;pre class="mermaid"&gt;sequenceDiagram
+participant Caller
+participant QueryMediator
+participant DI as DI Container (scope)
+participant Handler as IPaginatedQueryHandlerAsync
+Caller-&amp;gt;&amp;gt;QueryMediator: ExecutePaginatedQueryAsync&amp;lt;TQuery, TOutput&amp;gt;(query)
+note over Caller,QueryMediator: query.PageNumber and query.PageSize are set
+QueryMediator-&amp;gt;&amp;gt;DI: CreateScope()
+QueryMediator-&amp;gt;&amp;gt;DI: GetRequiredService&amp;lt;IPaginatedQueryHandlerAsync&amp;lt;TQuery, TOutput&amp;gt;&amp;gt;()
+DI--&amp;gt;&amp;gt;QueryMediator: handler
+QueryMediator-&amp;gt;&amp;gt;Handler: HandleAsync(query)
+Handler--&amp;gt;&amp;gt;QueryMediator: Task&amp;lt;PaginatedOutput&amp;lt;TOutput&amp;gt;&amp;gt;
+QueryMediator-&amp;gt;&amp;gt;DI: Dispose scope
+QueryMediator--&amp;gt;&amp;gt;Caller: PaginatedOutput&amp;lt;TOutput&amp;gt;
+&lt;/pre&gt;
+&lt;h3 id="single-result-query-synchronous"&gt;Single-Result Query (Synchronous)&lt;/h3&gt;
+&lt;pre class="mermaid"&gt;sequenceDiagram
+participant Caller
+participant QueryMediator
+participant DI as DI Container (scope)
+participant Handler as IQueryHandler
+Caller-&amp;gt;&amp;gt;QueryMediator: ExecuteQuery&amp;lt;TQuery, TOutput&amp;gt;(query)
+QueryMediator-&amp;gt;&amp;gt;DI: CreateScope()
+QueryMediator-&amp;gt;&amp;gt;DI: GetRequiredService&amp;lt;IQueryHandler&amp;lt;TQuery, TOutput&amp;gt;&amp;gt;()
+DI--&amp;gt;&amp;gt;QueryMediator: handler
+QueryMediator-&amp;gt;&amp;gt;Handler: Handle(query)
+Handler--&amp;gt;&amp;gt;QueryMediator: DataOutput&amp;lt;TOutput?&amp;gt;
+QueryMediator-&amp;gt;&amp;gt;DI: Dispose scope
+QueryMediator--&amp;gt;&amp;gt;Caller: DataOutput&amp;lt;TOutput?&amp;gt;
+&lt;/pre&gt;
+&lt;hr&gt;
+&lt;h2 id="usage-examples"&gt;Usage Examples&lt;/h2&gt;
+&lt;h3 id="single-result-query"&gt;Single-Result Query&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Query + output&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;GetProductQuery&lt;/span&gt; : BaseQuery
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; Guid Id { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;GetProductOutput&lt;/span&gt; : QueryOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; Guid Id { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;string&lt;/span&gt; Name { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; } = &lt;span style="color:#66d9ef"&gt;string&lt;/span&gt;.Empty;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;decimal&lt;/span&gt; Price { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Handler&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;GetProductHandler&lt;/span&gt; : IQueryHandlerAsync&amp;lt;GetProductQuery, GetProductOutput&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;private&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;readonly&lt;/span&gt; IProductRepository _repository;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; GetProductHandler(IProductRepository repository) =&amp;gt; _repository = repository;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;async&lt;/span&gt; Task&amp;lt;DataOutput&amp;lt;GetProductOutput?&amp;gt;&amp;gt; HandleAsync(GetProductQuery query)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; product = &lt;span style="color:#66d9ef"&gt;await&lt;/span&gt; _repository.FindByIdAsync(query.Id);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; product &lt;span style="color:#66d9ef"&gt;is&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;null&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; ? DataOutput&amp;lt;GetProductOutput?&amp;gt;.Failure(&lt;span style="color:#e6db74"&gt;&amp;#34;Product not found.&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; : DataOutput&amp;lt;GetProductOutput?&amp;gt;.Success(&lt;span style="color:#66d9ef"&gt;new&lt;/span&gt; GetProductOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Id = product.Id,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Name = product.Name,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; Price = product.Price
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; });
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Register&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;builder.Services.AddSingleton&amp;lt;QueryMediator&amp;gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;builder.Services.AddScoped&amp;lt;IQueryHandlerAsync&amp;lt;GetProductQuery, GetProductOutput&amp;gt;, GetProductHandler&amp;gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Dispatch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; result = &lt;span style="color:#66d9ef"&gt;await&lt;/span&gt; mediator.ExecuteQueryAsync&amp;lt;GetProductQuery, GetProductOutput&amp;gt;(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;new&lt;/span&gt; GetProductQuery { Id = productId });
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="paginated-query"&gt;Paginated Query&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"&gt;&lt;code class="language-csharp" data-lang="csharp"&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Query + output&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ListProductsQuery&lt;/span&gt; : BaseQuery &lt;span style="color:#75715e"&gt;// PageNumber and PageSize inherited&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;string?&lt;/span&gt; NameFilter { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ProductListItem&lt;/span&gt; : QueryOutput
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; Guid Id { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;string&lt;/span&gt; Name { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; } = &lt;span style="color:#66d9ef"&gt;string&lt;/span&gt;.Empty;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;decimal&lt;/span&gt; Price { &lt;span style="color:#66d9ef"&gt;get&lt;/span&gt;; &lt;span style="color:#66d9ef"&gt;set&lt;/span&gt;; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Handler&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;class&lt;/span&gt; &lt;span style="color:#a6e22e"&gt;ListProductsHandler&lt;/span&gt; : IPaginatedQueryHandlerAsync&amp;lt;ListProductsQuery, ProductListItem&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;private&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;readonly&lt;/span&gt; IProductRepository _repository;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; ListProductsHandler(IProductRepository repository) =&amp;gt; _repository = repository;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;public&lt;/span&gt; &lt;span style="color:#66d9ef"&gt;async&lt;/span&gt; Task&amp;lt;PaginatedOutput&amp;lt;ProductListItem&amp;gt;&amp;gt; HandleAsync(ListProductsQuery query)
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; (items, total) = &lt;span style="color:#66d9ef"&gt;await&lt;/span&gt; _repository.ListAsync(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; query.NameFilter, query.PageNumber, query.PageSize);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;return&lt;/span&gt; PaginatedOutput&amp;lt;ProductListItem&amp;gt;.Success(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; items.Select(p =&amp;gt; &lt;span style="color:#66d9ef"&gt;new&lt;/span&gt; ProductListItem { Id = p.Id, Name = p.Name, Price = p.Price }),
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; total, query.PageNumber, query.PageSize);
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Register&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;builder.Services.AddScoped&amp;lt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; IPaginatedQueryHandlerAsync&amp;lt;ListProductsQuery, ProductListItem&amp;gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; ListProductsHandler&amp;gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#75715e"&gt;// Dispatch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#66d9ef"&gt;var&lt;/span&gt; page = &lt;span style="color:#66d9ef"&gt;await&lt;/span&gt; mediator.ExecutePaginatedQueryAsync&amp;lt;ListProductsQuery, ProductListItem&amp;gt;(
+&lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt; &lt;span style="color:#66d9ef"&gt;new&lt;/span&gt; ListProductsQuery { NameFilter = &lt;span style="color:#e6db74"&gt;&amp;#34;Widget&amp;#34;&lt;/span&gt;, PageNumber = &lt;span style="color:#ae81ff"&gt;2&lt;/span&gt;, PageSize = &lt;span style="color:#ae81ff"&gt;20&lt;/span&gt; });
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;</content></item></channel></rss>

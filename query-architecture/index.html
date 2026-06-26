@@ -1,0 +1,236 @@
+<!doctype html><html lang=en><head><title>:: Dotnet Mediator</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Query Architecture Queries represent read-only requests for data. The query side of ArturRios.Mediator supports two result shapes: a single DataOutput<T> for item lookups and a PaginatedOutput<T> for collection queries that need page metadata.
+Core Types Type Purpose BaseQuery Abstract base class for all query data carriers QueryOutput Abstract base class for the result payload IQueryHandler<TQuery, TOutput> Synchronous single-result handler contract IQueryHandlerAsync<TQuery, TOutput> Asynchronous single-result handler contract IPaginatedQueryHandler<TQuery, TOutput> Synchronous paginated handler contract IPaginatedQueryHandlerAsync<TQuery, TOutput> Asynchronous paginated handler contract QueryMediator Resolves and invokes the registered handler BaseQuery public abstract class BaseQuery { public int PageNumber { get; set; } = 1; // 1-based public int PageSize { get; set; } = 100; } Derive from BaseQuery to create a query. Expose filter criteria as plain properties. The PageNumber and PageSize properties are consumed by paginated handlers and ignored by single-result ones.
+"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://artur-rios.github.io/dotnet-mediator/query-architecture/><link rel=stylesheet href=https://artur-rios.github.io/dotnet-mediator/styles.css><link rel="shortcut icon" href=https://artur-rios.github.io/dotnet-mediator/img/theme-colors/orange.png><link rel=apple-touch-icon href=https://artur-rios.github.io/dotnet-mediator/img/theme-colors/orange.png><meta name=twitter:card content="summary"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content><meta property="og:description" content="Query Architecture Queries represent read-only requests for data. The query side of ArturRios.Mediator supports two result shapes: a single DataOutput<T> for item lookups and a PaginatedOutput<T> for collection queries that need page metadata.
+Core Types Type Purpose BaseQuery Abstract base class for all query data carriers QueryOutput Abstract base class for the result payload IQueryHandler<TQuery, TOutput> Synchronous single-result handler contract IQueryHandlerAsync<TQuery, TOutput> Asynchronous single-result handler contract IPaginatedQueryHandler<TQuery, TOutput> Synchronous paginated handler contract IPaginatedQueryHandlerAsync<TQuery, TOutput> Asynchronous paginated handler contract QueryMediator Resolves and invokes the registered handler BaseQuery public abstract class BaseQuery { public int PageNumber { get; set; } = 1; // 1-based public int PageSize { get; set; } = 100; } Derive from BaseQuery to create a query. Expose filter criteria as plain properties. The PageNumber and PageSize properties are consumed by paginated handlers and ignored by single-result ones.
+"><meta property="og:url" content="https://artur-rios.github.io/dotnet-mediator/query-architecture/"><meta property="og:site_name" content="Dotnet Mediator"><meta property="og:image" content="img/favicon/%!s(<nil>).png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=https://artur-rios.github.io/dotnet-mediator/><div class=logo>Dotnet Mediator</div></a></div><ul class="menu menu--mobile"><li class=menu__trigger>Menu&nbsp;▾</li><li><ul class=menu__dropdown><li><a href=https://www.artur-rios.tech/>Author</a></li><li><a href=https://github.com/artur-rios/dotnet-mediator>GitHub</a></li><li><a href=https://artur-rios.github.io/dotnet-mediator/coverage-report>Test Coverage</a></li></ul></li></ul></div><nav class=navigation-menu><ul class="navigation-menu__inner menu--desktop"><li><a href=https://www.artur-rios.tech/>Author</a></li><li><a href=https://github.com/artur-rios/dotnet-mediator>GitHub</a></li><li><a href=https://artur-rios.github.io/dotnet-mediator/coverage-report>Test Coverage</a></li></ul></nav></header><div class=content><article class=post><h1 class=post-title><a href=https://artur-rios.github.io/dotnet-mediator/query-architecture/></a></h1><div class=post-meta></div><div class=post-content><div><h1 id=query-architecture>Query Architecture<a href=#query-architecture class=hanchor arialabel=Anchor>&#8983;</a></h1><p>Queries represent <strong>read-only requests</strong> for data. The query side of <code>ArturRios.Mediator</code> supports two result shapes: a single <code>DataOutput&lt;T></code> for item lookups and a <code>PaginatedOutput&lt;T></code> for collection queries that need page metadata.</p><h2 id=core-types>Core Types<a href=#core-types class=hanchor arialabel=Anchor>&#8983;</a></h2><table><thead><tr><th>Type</th><th>Purpose</th></tr></thead><tbody><tr><td><code>BaseQuery</code></td><td>Abstract base class for all query data carriers</td></tr><tr><td><code>QueryOutput</code></td><td>Abstract base class for the result payload</td></tr><tr><td><code>IQueryHandler&lt;TQuery, TOutput></code></td><td>Synchronous single-result handler contract</td></tr><tr><td><code>IQueryHandlerAsync&lt;TQuery, TOutput></code></td><td>Asynchronous single-result handler contract</td></tr><tr><td><code>IPaginatedQueryHandler&lt;TQuery, TOutput></code></td><td>Synchronous paginated handler contract</td></tr><tr><td><code>IPaginatedQueryHandlerAsync&lt;TQuery, TOutput></code></td><td>Asynchronous paginated handler contract</td></tr><tr><td><code>QueryMediator</code></td><td>Resolves and invokes the registered handler</td></tr></tbody></table><h3 id=basequery>BaseQuery<a href=#basequery class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>BaseQuery</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>int</span> PageNumber { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; } = <span style=color:#ae81ff>1</span>;   <span style=color:#75715e>// 1-based</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>int</span> PageSize   { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; } = <span style=color:#ae81ff>100</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Derive from <code>BaseQuery</code> to create a query. Expose filter criteria as plain properties. The <code>PageNumber</code> and <code>PageSize</code> properties are consumed by paginated handlers and ignored by single-result ones.</p><h3 id=queryoutput>QueryOutput<a href=#queryoutput class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>QueryOutput</span>;
+</span></span></code></pre></div><p>Derive from <code>QueryOutput</code> to describe the shape of the data returned by a query.</p><h3 id=iqueryhandler--iqueryhandlerasync>IQueryHandler / IQueryHandlerAsync<a href=#iqueryhandler--iqueryhandlerasync class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>IQueryHandler</span>&lt;<span style=color:#66d9ef>in</span> TQuery, TOutput&gt;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TQuery  : BaseQuery
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TOutput : QueryOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    DataOutput&lt;TOutput?&gt; Handle(TQuery query);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>IQueryHandlerAsync</span>&lt;<span style=color:#66d9ef>in</span> TQuery, TOutput&gt;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TQuery  : BaseQuery
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TOutput : QueryOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Task&lt;DataOutput&lt;TOutput?&gt;&gt; HandleAsync(TQuery query);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Use for queries that return a <strong>single</strong> result. Register one implementation per <code>&lt;TQuery, TOutput></code> pair.</p><h3 id=ipaginatedqueryhandler--ipaginatedqueryhandlerasync>IPaginatedQueryHandler / IPaginatedQueryHandlerAsync<a href=#ipaginatedqueryhandler--ipaginatedqueryhandlerasync class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>IPaginatedQueryHandler</span>&lt;<span style=color:#66d9ef>in</span> TQuery, TOutput&gt;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TQuery  : BaseQuery
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TOutput : QueryOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    PaginatedOutput&lt;TOutput&gt; Handle(TQuery query);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>IPaginatedQueryHandlerAsync</span>&lt;<span style=color:#66d9ef>in</span> TQuery, TOutput&gt;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TQuery  : BaseQuery
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TOutput : QueryOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Task&lt;PaginatedOutput&lt;TOutput&gt;&gt; HandleAsync(TQuery query);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Use for queries that return a <strong>page of results</strong> together with pagination metadata (<code>TotalCount</code>, <code>TotalPages</code>, etc. provided by <code>PaginatedOutput&lt;T></code>).</p><h3 id=querymediator>QueryMediator<a href=#querymediator class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>QueryMediator</span>(IServiceScopeFactory scopeFactory)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> DataOutput&lt;TOutput?&gt;         ExecuteQuery              &lt;TQuery, TOutput&gt;(TQuery query) ...
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> Task&lt;DataOutput&lt;TOutput?&gt;&gt;   ExecuteQueryAsync         &lt;TQuery, TOutput&gt;(TQuery query) ...
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> PaginatedOutput&lt;TOutput&gt;     ExecutePaginatedQuery     &lt;TQuery, TOutput&gt;(TQuery query) ...
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> Task&lt;PaginatedOutput&lt;TOutput&gt;&gt; ExecutePaginatedQueryAsync&lt;TQuery, TOutput&gt;(TQuery query) ...
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope.</p><hr><h2 id=class-diagram>Class Diagram<a href=#class-diagram class=hanchor arialabel=Anchor>&#8983;</a></h2><pre class=mermaid>classDiagram
+    direction TB
+
+    class BaseQuery {
+        &lt;&lt;abstract&gt;&gt;
+        +PageNumber int
+        +PageSize int
+    }
+
+    class QueryOutput {
+        &lt;&lt;abstract&gt;&gt;
+    }
+
+    class IQueryHandler~TQuery TOutput~ {
+        &lt;&lt;interface&gt;&gt;
+        +Handle(query TQuery) DataOutput~TOutput?~
+    }
+
+    class IQueryHandlerAsync~TQuery TOutput~ {
+        &lt;&lt;interface&gt;&gt;
+        +HandleAsync(query TQuery) Task~DataOutput~TOutput?~~
+    }
+
+    class IPaginatedQueryHandler~TQuery TOutput~ {
+        &lt;&lt;interface&gt;&gt;
+        +Handle(query TQuery) PaginatedOutput~TOutput~
+    }
+
+    class IPaginatedQueryHandlerAsync~TQuery TOutput~ {
+        &lt;&lt;interface&gt;&gt;
+        +HandleAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+    }
+
+    class QueryMediator {
+        -IServiceScopeFactory _scopeFactory
+        +ExecuteQuery(query TQuery) DataOutput~TOutput?~
+        +ExecuteQueryAsync(query TQuery) Task~DataOutput~TOutput?~~
+        +ExecutePaginatedQuery(query TQuery) PaginatedOutput~TOutput~
+        +ExecutePaginatedQueryAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+    }
+
+    class CommandQueryMediator {
+        -CommandMediator _commandMediator
+        -QueryMediator _queryMediator
+        +ExecuteQuery(query TQuery) DataOutput~TOutput?~
+        +ExecuteQueryAsync(query TQuery) Task~DataOutput~TOutput?~~
+        +ExecutePaginatedQuery(query TQuery) PaginatedOutput~TOutput~
+        +ExecutePaginatedQueryAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+    }
+
+    IQueryHandler~TQuery TOutput~ ..&gt; BaseQuery : constrains TQuery
+    IQueryHandler~TQuery TOutput~ ..&gt; QueryOutput : constrains TOutput
+    IQueryHandlerAsync~TQuery TOutput~ ..&gt; BaseQuery : constrains TQuery
+    IQueryHandlerAsync~TQuery TOutput~ ..&gt; QueryOutput : constrains TOutput
+    IPaginatedQueryHandler~TQuery TOutput~ ..&gt; BaseQuery : constrains TQuery
+    IPaginatedQueryHandler~TQuery TOutput~ ..&gt; QueryOutput : constrains TOutput
+    IPaginatedQueryHandlerAsync~TQuery TOutput~ ..&gt; BaseQuery : constrains TQuery
+    IPaginatedQueryHandlerAsync~TQuery TOutput~ ..&gt; QueryOutput : constrains TOutput
+    QueryMediator --&gt; IQueryHandler~TQuery TOutput~ : resolves &amp; invokes
+    QueryMediator --&gt; IQueryHandlerAsync~TQuery TOutput~ : resolves &amp; invokes
+    QueryMediator --&gt; IPaginatedQueryHandler~TQuery TOutput~ : resolves &amp; invokes
+    QueryMediator --&gt; IPaginatedQueryHandlerAsync~TQuery TOutput~ : resolves &amp; invokes
+    CommandQueryMediator --&gt; QueryMediator : delegates to
+</pre><hr><h2 id=sequence-diagrams>Sequence Diagrams<a href=#sequence-diagrams class=hanchor arialabel=Anchor>&#8983;</a></h2><h3 id=single-result-query-asynchronous>Single-Result Query (Asynchronous)<a href=#single-result-query-asynchronous class=hanchor arialabel=Anchor>&#8983;</a></h3><pre class=mermaid>sequenceDiagram
+    participant Caller
+    participant QueryMediator
+    participant DI as DI Container (scope)
+    participant Handler as IQueryHandlerAsync
+
+    Caller-&gt;&gt;QueryMediator: ExecuteQueryAsync&lt;TQuery, TOutput&gt;(query)
+    QueryMediator-&gt;&gt;DI: CreateScope()
+    QueryMediator-&gt;&gt;DI: GetRequiredService&lt;IQueryHandlerAsync&lt;TQuery, TOutput&gt;&gt;()
+    DI--&gt;&gt;QueryMediator: handler
+    QueryMediator-&gt;&gt;Handler: HandleAsync(query)
+    Handler--&gt;&gt;QueryMediator: Task&lt;DataOutput&lt;TOutput?&gt;&gt;
+    QueryMediator-&gt;&gt;DI: Dispose scope
+    QueryMediator--&gt;&gt;Caller: DataOutput&lt;TOutput?&gt;
+</pre><h3 id=paginated-query-asynchronous>Paginated Query (Asynchronous)<a href=#paginated-query-asynchronous class=hanchor arialabel=Anchor>&#8983;</a></h3><pre class=mermaid>sequenceDiagram
+    participant Caller
+    participant QueryMediator
+    participant DI as DI Container (scope)
+    participant Handler as IPaginatedQueryHandlerAsync
+
+    Caller-&gt;&gt;QueryMediator: ExecutePaginatedQueryAsync&lt;TQuery, TOutput&gt;(query)
+    note over Caller,QueryMediator: query.PageNumber and query.PageSize are set
+    QueryMediator-&gt;&gt;DI: CreateScope()
+    QueryMediator-&gt;&gt;DI: GetRequiredService&lt;IPaginatedQueryHandlerAsync&lt;TQuery, TOutput&gt;&gt;()
+    DI--&gt;&gt;QueryMediator: handler
+    QueryMediator-&gt;&gt;Handler: HandleAsync(query)
+    Handler--&gt;&gt;QueryMediator: Task&lt;PaginatedOutput&lt;TOutput&gt;&gt;
+    QueryMediator-&gt;&gt;DI: Dispose scope
+    QueryMediator--&gt;&gt;Caller: PaginatedOutput&lt;TOutput&gt;
+</pre><h3 id=single-result-query-synchronous>Single-Result Query (Synchronous)<a href=#single-result-query-synchronous class=hanchor arialabel=Anchor>&#8983;</a></h3><pre class=mermaid>sequenceDiagram
+    participant Caller
+    participant QueryMediator
+    participant DI as DI Container (scope)
+    participant Handler as IQueryHandler
+
+    Caller-&gt;&gt;QueryMediator: ExecuteQuery&lt;TQuery, TOutput&gt;(query)
+    QueryMediator-&gt;&gt;DI: CreateScope()
+    QueryMediator-&gt;&gt;DI: GetRequiredService&lt;IQueryHandler&lt;TQuery, TOutput&gt;&gt;()
+    DI--&gt;&gt;QueryMediator: handler
+    QueryMediator-&gt;&gt;Handler: Handle(query)
+    Handler--&gt;&gt;QueryMediator: DataOutput&lt;TOutput?&gt;
+    QueryMediator-&gt;&gt;DI: Dispose scope
+    QueryMediator--&gt;&gt;Caller: DataOutput&lt;TOutput?&gt;
+</pre><hr><h2 id=usage-examples>Usage Examples<a href=#usage-examples class=hanchor arialabel=Anchor>&#8983;</a></h2><h3 id=single-result-query>Single-Result Query<a href=#single-result-query class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#75715e>// Query + output</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>GetProductQuery</span> : BaseQuery
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> Guid Id { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>GetProductOutput</span> : QueryOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> Guid   Id    { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>string</span> Name  { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; } = <span style=color:#66d9ef>string</span>.Empty;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>decimal</span> Price { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Handler</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>GetProductHandler</span> : IQueryHandlerAsync&lt;GetProductQuery, GetProductOutput&gt;
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>readonly</span> IProductRepository _repository;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> GetProductHandler(IProductRepository repository) =&gt; _repository = repository;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>async</span> Task&lt;DataOutput&lt;GetProductOutput?&gt;&gt; HandleAsync(GetProductQuery query)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>var</span> product = <span style=color:#66d9ef>await</span> _repository.FindByIdAsync(query.Id);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> product <span style=color:#66d9ef>is</span> <span style=color:#66d9ef>null</span>
+</span></span><span style=display:flex><span>            ? DataOutput&lt;GetProductOutput?&gt;.Failure(<span style=color:#e6db74>&#34;Product not found.&#34;</span>)
+</span></span><span style=display:flex><span>            : DataOutput&lt;GetProductOutput?&gt;.Success(<span style=color:#66d9ef>new</span> GetProductOutput
+</span></span><span style=display:flex><span>              {
+</span></span><span style=display:flex><span>                  Id    = product.Id,
+</span></span><span style=display:flex><span>                  Name  = product.Name,
+</span></span><span style=display:flex><span>                  Price = product.Price
+</span></span><span style=display:flex><span>              });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Register</span>
+</span></span><span style=display:flex><span>builder.Services.AddSingleton&lt;QueryMediator&gt;();
+</span></span><span style=display:flex><span>builder.Services.AddScoped&lt;IQueryHandlerAsync&lt;GetProductQuery, GetProductOutput&gt;, GetProductHandler&gt;();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Dispatch</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> result = <span style=color:#66d9ef>await</span> mediator.ExecuteQueryAsync&lt;GetProductQuery, GetProductOutput&gt;(
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>new</span> GetProductQuery { Id = productId });
+</span></span></code></pre></div><h3 id=paginated-query>Paginated Query<a href=#paginated-query class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#75715e>// Query + output</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>ListProductsQuery</span> : BaseQuery   <span style=color:#75715e>// PageNumber and PageSize inherited</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>string?</span> NameFilter { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>ProductListItem</span> : QueryOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> Guid   Id    { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>string</span> Name  { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; } = <span style=color:#66d9ef>string</span>.Empty;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>decimal</span> Price { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Handler</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>ListProductsHandler</span> : IPaginatedQueryHandlerAsync&lt;ListProductsQuery, ProductListItem&gt;
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>readonly</span> IProductRepository _repository;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> ListProductsHandler(IProductRepository repository) =&gt; _repository = repository;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>async</span> Task&lt;PaginatedOutput&lt;ProductListItem&gt;&gt; HandleAsync(ListProductsQuery query)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>var</span> (items, total) = <span style=color:#66d9ef>await</span> _repository.ListAsync(
+</span></span><span style=display:flex><span>            query.NameFilter, query.PageNumber, query.PageSize);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> PaginatedOutput&lt;ProductListItem&gt;.Success(
+</span></span><span style=display:flex><span>            items.Select(p =&gt; <span style=color:#66d9ef>new</span> ProductListItem { Id = p.Id, Name = p.Name, Price = p.Price }),
+</span></span><span style=display:flex><span>            total, query.PageNumber, query.PageSize);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Register</span>
+</span></span><span style=display:flex><span>builder.Services.AddScoped&lt;
+</span></span><span style=display:flex><span>    IPaginatedQueryHandlerAsync&lt;ListProductsQuery, ProductListItem&gt;,
+</span></span><span style=display:flex><span>    ListProductsHandler&gt;();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Dispatch</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> page = <span style=color:#66d9ef>await</span> mediator.ExecutePaginatedQueryAsync&lt;ListProductsQuery, ProductListItem&gt;(
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>new</span> ListProductsQuery { NameFilter = <span style=color:#e6db74>&#34;Widget&#34;</span>, PageNumber = <span style=color:#ae81ff>2</span>, PageSize = <span style=color:#ae81ff>20</span> });
+</span></span></code></pre></div><hr></div></div><div class=page-nav><span>Back to <a href=/dotnet-mediator>Home</a></span>
+<span class=page-nav-next>| See also <a href=/dotnet-mediator/command-architecture>Command Architecture</a></span></div></article></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2026 Powered by <a href=https://gohugo.io>Hugo</a></span>
+<span><a href=https://github.com/mirus-ua/hugo-theme-re-terminal target=_blank>Original theme</a> made by <a href=https://github.com/mirus-ua target=_blank>Mirus</a></span>
+<span><a href=https://github.com/artur-rios/hugo-theme-re-terminal target=_blank>This version</a> is made by <a href=https://github.com/artur-rios target=_blank>Artur Rios</a></span></div></div></footer><script type=text/javascript src=/dotnet-mediator/bundle.min.js></script></div><script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script></body></html>

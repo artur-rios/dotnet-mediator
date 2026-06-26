@@ -1,0 +1,128 @@
+<!doctype html><html lang=en><head><title>:: Dotnet Mediator</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Command Architecture Commands represent write intents — creating, updating, or deleting state. The command side of ArturRios.Mediator enforces a strict one-command-one-handler rule and isolates each execution in its own DI scope.
+Core Types Type Purpose BaseCommand Abstract base class for all command data carriers CommandOutput Abstract base class for the result payload ICommandHandler<TCommand, TOutput> Synchronous handler contract ICommandHandlerAsync<TCommand, TOutput> Asynchronous handler contract CommandMediator Resolves and invokes the registered handler BaseCommand public abstract class BaseCommand; Derive from BaseCommand to create a command. Expose the data the handler needs as plain properties. Commands are simple data carriers — no business logic belongs here.
+"><meta name=keywords content><meta name=robots content="noodp"><link rel=canonical href=https://artur-rios.github.io/dotnet-mediator/command-architecture/><link rel=stylesheet href=https://artur-rios.github.io/dotnet-mediator/styles.css><link rel="shortcut icon" href=https://artur-rios.github.io/dotnet-mediator/img/theme-colors/orange.png><link rel=apple-touch-icon href=https://artur-rios.github.io/dotnet-mediator/img/theme-colors/orange.png><meta name=twitter:card content="summary"><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="og:title" content><meta property="og:description" content="Command Architecture Commands represent write intents — creating, updating, or deleting state. The command side of ArturRios.Mediator enforces a strict one-command-one-handler rule and isolates each execution in its own DI scope.
+Core Types Type Purpose BaseCommand Abstract base class for all command data carriers CommandOutput Abstract base class for the result payload ICommandHandler<TCommand, TOutput> Synchronous handler contract ICommandHandlerAsync<TCommand, TOutput> Asynchronous handler contract CommandMediator Resolves and invokes the registered handler BaseCommand public abstract class BaseCommand; Derive from BaseCommand to create a command. Expose the data the handler needs as plain properties. Commands are simple data carriers — no business logic belongs here.
+"><meta property="og:url" content="https://artur-rios.github.io/dotnet-mediator/command-architecture/"><meta property="og:site_name" content="Dotnet Mediator"><meta property="og:image" content="img/favicon/%!s(<nil>).png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"></head><body><div class="container center headings--one-size"><header class=header><div class=header__inner><div class=header__logo><a href=https://artur-rios.github.io/dotnet-mediator/><div class=logo>Dotnet Mediator</div></a></div><ul class="menu menu--mobile"><li class=menu__trigger>Menu&nbsp;▾</li><li><ul class=menu__dropdown><li><a href=https://www.artur-rios.tech/>Author</a></li><li><a href=https://github.com/artur-rios/dotnet-mediator>GitHub</a></li><li><a href=https://artur-rios.github.io/dotnet-mediator/coverage-report>Test Coverage</a></li></ul></li></ul></div><nav class=navigation-menu><ul class="navigation-menu__inner menu--desktop"><li><a href=https://www.artur-rios.tech/>Author</a></li><li><a href=https://github.com/artur-rios/dotnet-mediator>GitHub</a></li><li><a href=https://artur-rios.github.io/dotnet-mediator/coverage-report>Test Coverage</a></li></ul></nav></header><div class=content><article class=post><h1 class=post-title><a href=https://artur-rios.github.io/dotnet-mediator/command-architecture/></a></h1><div class=post-meta></div><div class=post-content><div><h1 id=command-architecture>Command Architecture<a href=#command-architecture class=hanchor arialabel=Anchor>&#8983;</a></h1><p>Commands represent <strong>write intents</strong> — creating, updating, or deleting state. The command side of <code>ArturRios.Mediator</code> enforces a strict one-command-one-handler rule and isolates each execution in its own DI scope.</p><h2 id=core-types>Core Types<a href=#core-types class=hanchor arialabel=Anchor>&#8983;</a></h2><table><thead><tr><th>Type</th><th>Purpose</th></tr></thead><tbody><tr><td><code>BaseCommand</code></td><td>Abstract base class for all command data carriers</td></tr><tr><td><code>CommandOutput</code></td><td>Abstract base class for the result payload</td></tr><tr><td><code>ICommandHandler&lt;TCommand, TOutput></code></td><td>Synchronous handler contract</td></tr><tr><td><code>ICommandHandlerAsync&lt;TCommand, TOutput></code></td><td>Asynchronous handler contract</td></tr><tr><td><code>CommandMediator</code></td><td>Resolves and invokes the registered handler</td></tr></tbody></table><h3 id=basecommand>BaseCommand<a href=#basecommand class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>BaseCommand</span>;
+</span></span></code></pre></div><p>Derive from <code>BaseCommand</code> to create a command. Expose the data the handler needs as plain properties. Commands are simple data carriers — no business logic belongs here.</p><h3 id=commandoutput>CommandOutput<a href=#commandoutput class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>CommandOutput</span>;
+</span></span></code></pre></div><p>Derive from <code>CommandOutput</code> to describe the result of a command (for example, the identifier of the newly created entity). The mediator wraps it in <code>DataOutput&lt;TOutput?></code> before returning it to the caller.</p><h3 id=icommandhandler>ICommandHandler<a href=#icommandhandler class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>ICommandHandler</span>&lt;<span style=color:#66d9ef>in</span> TCommand, TOutput&gt;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TCommand : BaseCommand
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TOutput  : CommandOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    DataOutput&lt;TOutput?&gt; Handle(TCommand command);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Implement for synchronous execution. Register <strong>one</strong> implementation per <code>&lt;TCommand, TOutput></code> pair in the DI container.</p><h3 id=icommandhandlerasync>ICommandHandlerAsync<a href=#icommandhandlerasync class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>ICommandHandlerAsync</span>&lt;<span style=color:#66d9ef>in</span> TCommand, TOutput&gt;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TCommand : BaseCommand
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>where</span> TOutput  : CommandOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Task&lt;DataOutput&lt;TOutput?&gt;&gt; HandleAsync(TCommand command);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Implement for asynchronous execution. Register <strong>one</strong> implementation per <code>&lt;TCommand, TOutput></code> pair in the DI container.</p><h3 id=commandmediator>CommandMediator<a href=#commandmediator class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>CommandMediator</span>(IServiceScopeFactory scopeFactory)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> DataOutput&lt;TOutput?&gt;       ExecuteCommand     &lt;TCommand, TOutput&gt;(TCommand command) ...
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> Task&lt;DataOutput&lt;TOutput?&gt;&gt; ExecuteCommandAsync&lt;TCommand, TOutput&gt;(TCommand command) ...
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope. This ensures scoped dependencies (e.g. <code>DbContext</code>) are isolated per command execution.</p><hr><h2 id=class-diagram>Class Diagram<a href=#class-diagram class=hanchor arialabel=Anchor>&#8983;</a></h2><pre class=mermaid>classDiagram
+    direction TB
+
+    class BaseCommand {
+        &lt;&lt;abstract&gt;&gt;
+    }
+
+    class CommandOutput {
+        &lt;&lt;abstract&gt;&gt;
+    }
+
+    class ICommandHandler~TCommand TOutput~ {
+        &lt;&lt;interface&gt;&gt;
+        +Handle(command TCommand) DataOutput~TOutput?~
+    }
+
+    class ICommandHandlerAsync~TCommand TOutput~ {
+        &lt;&lt;interface&gt;&gt;
+        +HandleAsync(command TCommand) Task~DataOutput~TOutput?~~
+    }
+
+    class CommandMediator {
+        -IServiceScopeFactory _scopeFactory
+        +ExecuteCommand(command TCommand) DataOutput~TOutput?~
+        +ExecuteCommandAsync(command TCommand) Task~DataOutput~TOutput?~~
+    }
+
+    class CommandQueryMediator {
+        -CommandMediator _commandMediator
+        -QueryMediator _queryMediator
+        +ExecuteCommand(command TCommand) DataOutput~TOutput?~
+        +ExecuteCommandAsync(command TCommand) Task~DataOutput~TOutput?~~
+    }
+
+    ICommandHandler~TCommand TOutput~ ..&gt; BaseCommand : constrains TCommand
+    ICommandHandler~TCommand TOutput~ ..&gt; CommandOutput : constrains TOutput
+    ICommandHandlerAsync~TCommand TOutput~ ..&gt; BaseCommand : constrains TCommand
+    ICommandHandlerAsync~TCommand TOutput~ ..&gt; CommandOutput : constrains TOutput
+    CommandMediator --&gt; ICommandHandler~TCommand TOutput~ : resolves &amp; invokes
+    CommandMediator --&gt; ICommandHandlerAsync~TCommand TOutput~ : resolves &amp; invokes
+    CommandQueryMediator --&gt; CommandMediator : delegates to
+</pre><hr><h2 id=sequence-diagrams>Sequence Diagrams<a href=#sequence-diagrams class=hanchor arialabel=Anchor>&#8983;</a></h2><h3 id=synchronous-command-execution>Synchronous Command Execution<a href=#synchronous-command-execution class=hanchor arialabel=Anchor>&#8983;</a></h3><pre class=mermaid>sequenceDiagram
+    participant Caller
+    participant CommandMediator
+    participant DI as DI Container (scope)
+    participant Handler as ICommandHandler
+
+    Caller-&gt;&gt;CommandMediator: ExecuteCommand&lt;TCommand, TOutput&gt;(command)
+    CommandMediator-&gt;&gt;DI: CreateScope()
+    CommandMediator-&gt;&gt;DI: GetRequiredService&lt;ICommandHandler&lt;TCommand, TOutput&gt;&gt;()
+    DI--&gt;&gt;CommandMediator: handler
+    CommandMediator-&gt;&gt;Handler: Handle(command)
+    Handler--&gt;&gt;CommandMediator: DataOutput&lt;TOutput?&gt;
+    CommandMediator-&gt;&gt;DI: Dispose scope
+    CommandMediator--&gt;&gt;Caller: DataOutput&lt;TOutput?&gt;
+</pre><h3 id=asynchronous-command-execution>Asynchronous Command Execution<a href=#asynchronous-command-execution class=hanchor arialabel=Anchor>&#8983;</a></h3><pre class=mermaid>sequenceDiagram
+    participant Caller
+    participant CommandMediator
+    participant DI as DI Container (scope)
+    participant Handler as ICommandHandlerAsync
+
+    Caller-&gt;&gt;CommandMediator: ExecuteCommandAsync&lt;TCommand, TOutput&gt;(command)
+    CommandMediator-&gt;&gt;DI: CreateScope()
+    CommandMediator-&gt;&gt;DI: GetRequiredService&lt;ICommandHandlerAsync&lt;TCommand, TOutput&gt;&gt;()
+    DI--&gt;&gt;CommandMediator: handler
+    CommandMediator-&gt;&gt;Handler: HandleAsync(command)
+    Handler--&gt;&gt;CommandMediator: Task&lt;DataOutput&lt;TOutput?&gt;&gt;
+    CommandMediator-&gt;&gt;DI: Dispose scope
+    CommandMediator--&gt;&gt;Caller: DataOutput&lt;TOutput?&gt;
+</pre><hr><h2 id=usage-example>Usage Example<a href=#usage-example class=hanchor arialabel=Anchor>&#8983;</a></h2><h3 id=define-the-command-and-output>Define the command and output<a href=#define-the-command-and-output class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>CreateProductCommand</span> : BaseCommand
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>string</span> Name  { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; } = <span style=color:#66d9ef>string</span>.Empty;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>decimal</span> Price { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>CreateProductOutput</span> : CommandOutput
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> Guid Id { <span style=color:#66d9ef>get</span>; <span style=color:#66d9ef>set</span>; }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=implement-the-handler>Implement the handler<a href=#implement-the-handler class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>CreateProductHandler</span> : ICommandHandlerAsync&lt;CreateProductCommand, CreateProductOutput&gt;
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>readonly</span> IProductRepository _repository;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> CreateProductHandler(IProductRepository repository) =&gt; _repository = repository;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>async</span> Task&lt;DataOutput&lt;CreateProductOutput?&gt;&gt; HandleAsync(CreateProductCommand command)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>var</span> id = <span style=color:#66d9ef>await</span> _repository.InsertAsync(command.Name, command.Price);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> DataOutput&lt;CreateProductOutput?&gt;.Success(<span style=color:#66d9ef>new</span> CreateProductOutput { Id = id });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=register-in-di>Register in DI<a href=#register-in-di class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span>builder.Services.AddSingleton&lt;CommandMediator&gt;();
+</span></span><span style=display:flex><span>builder.Services.AddScoped&lt;ICommandHandlerAsync&lt;CreateProductCommand, CreateProductOutput&gt;, CreateProductHandler&gt;();
+</span></span></code></pre></div><h3 id=dispatch>Dispatch<a href=#dispatch class=hanchor arialabel=Anchor>&#8983;</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#66d9ef>var</span> result = <span style=color:#66d9ef>await</span> mediator.ExecuteCommandAsync&lt;CreateProductCommand, CreateProductOutput&gt;(
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>new</span> CreateProductCommand { Name = <span style=color:#e6db74>&#34;Widget&#34;</span>, Price = <span style=color:#ae81ff>9.99</span>m });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> (result.IsSuccess)
+</span></span><span style=display:flex><span>    Console.WriteLine(<span style=color:#e6db74>$&#34;Created: {result.Data!.Id}&#34;</span>);
+</span></span></code></pre></div><hr></div></div><div class=page-nav><span>Back to <a href=/dotnet-mediator>Home</a></span>
+<span class=page-nav-next>| See also <a href=/dotnet-mediator/query-architecture>Query Architecture</a></span></div></article></div><footer class=footer><div class=footer__inner><div class=copyright><span>© 2026 Powered by <a href=https://gohugo.io>Hugo</a></span>
+<span><a href=https://github.com/mirus-ua/hugo-theme-re-terminal target=_blank>Original theme</a> made by <a href=https://github.com/mirus-ua target=_blank>Mirus</a></span>
+<span><a href=https://github.com/artur-rios/hugo-theme-re-terminal target=_blank>This version</a> is made by <a href=https://github.com/artur-rios target=_blank>Artur Rios</a></span></div></div></footer><script type=text/javascript src=/dotnet-mediator/bundle.min.js></script></div><script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script></body></html>
