@@ -82,8 +82,8 @@ The library ships three mediator classes and a full set of handler interfaces:
 
 For detailed architecture documentation and sequence diagrams see:
 
-- [Command Architecture](docs/content/command-architecture.md)
-- [Query Architecture](docs/content/query-architecture.md)
+- [Command Architecture](https://artur-rios.github.io/dotnet-mediator/command-architecture/)
+- [Query Architecture](https://artur-rios.github.io/dotnet-mediator/query-architecture/)
 
 ## Versioning
 
@@ -100,4 +100,4 @@ If you want, optional helper toolsets I built to facilitate these tasks are avai
 
 ## Legal Details
 
-This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License). A copy of the license is available at [LICENSE](./LICENSE) in the repository.
+This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License). A copy of the license is available at [LICENSE](https://github.com/artur-rios/dotnet-mediator/blob/main/LICENSE) in the repository.
