@@ -4,7 +4,7 @@
     <LangVersion>latest</LangVersion>
     <Authors>Artur Rios</Authors>
     <Company>Artur Rios</Company>
-    <Description>Provides a mediator that works with the Command design pattern</Description>
+    <Description>A lightweight .NET library that implements the Mediator pattern on top of the built-in dependency injection container</Description>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -14,11 +14,11 @@
     <Nullable>enable</Nullable>
     <PackageId>ArturRios.Mediator</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://artur-rios.github.io/dotnet-mediator/</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags></PackageTags>
-    <RepositoryUrl>https://github.com/artur-rios/dotnet-command-mediator</RepositoryUrl>
-    <Version>1.0.0</Version>
+    <PackageTags>dotnet;mediator;cqrs;command;query</PackageTags>
+    <RepositoryUrl>https://github.com/artur-rios/dotnet-mediator</RepositoryUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="" />
@@ -27,4 +27,3 @@
     <PackageReference Include="ArturRios.Output" Version="2.0.1" />
   </ItemGroup>
 </Project>
-
