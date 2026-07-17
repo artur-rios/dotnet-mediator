@@ -10,7 +10,7 @@ Each command or query is dispatched to a dedicated handler resolved from a fresh
 
 ## Installation
 
-```
+```bash
 dotnet add package ArturRios.Mediator
 ```
 

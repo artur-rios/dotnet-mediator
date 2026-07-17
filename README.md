@@ -1,12 +1,16 @@
 ﻿# Command Mediator
 
+[![Docs](https://img.shields.io/badge/docs-website-blue)](https://artur-rios.github.io/dotnet-mediator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![NuGet](https://img.shields.io/nuget/v/ArturRios.Mediator.svg)](https://www.nuget.org/packages/ArturRios.Mediator)
+
 `ArturRios.Mediator` is a lightweight .NET library that implements the [Mediator pattern](https://refactoring.guru/design-patterns/mediator) on top of the built-in dependency injection container, providing a clean CQRS-style separation between **commands** (write operations) and **queries** (read operations).
 
 Each command or query is dispatched to a dedicated handler resolved from a fresh DI scope, so scoped dependencies such as a database context are isolated per execution. Both synchronous and asynchronous variants are supported for every handler type.
 
 ## Installation
 
-```
+```bash
 dotnet add package ArturRios.Mediator
 ```
 
