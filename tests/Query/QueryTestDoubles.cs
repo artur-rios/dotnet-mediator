@@ -69,7 +69,7 @@ public class SearchPaginatedQueryHandler : IPaginatedQueryHandler<SearchQuery, S
         WasCalled = true;
         ReceivedQuery = query;
 
-        var output = PaginatedOutput<SearchQueryOutput>.New.WithPagination(query.PageNumber, 1);
+        var output = PaginatedOutput<SearchQueryOutput>.New.WithPagination(query.PageNumber, 1, 1);
         output.AddItem(new SearchQueryOutput { Value = query.Term });
 
         return output;
@@ -91,7 +91,7 @@ public class SearchPaginatedQueryHandlerAsync : IPaginatedQueryHandlerAsync<Sear
         WasCalled = true;
         ReceivedQuery = query;
 
-        var output = PaginatedOutput<SearchQueryOutput>.New.WithPagination(query.PageNumber, 1);
+        var output = PaginatedOutput<SearchQueryOutput>.New.WithPagination(query.PageNumber, 1, 1);
         output.AddItem(new SearchQueryOutput { Value = query.Term });
 
         return output;
