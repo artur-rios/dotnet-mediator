@@ -1,11 +1,9 @@
-+++
-title = "Query Architecture"
-show_nav       = true
-nav_back_label = "Home"
-nav_back_url   = "/dotnet-mediator"
-nav_next_label = "Command Architecture"
-nav_next_url   = "/dotnet-mediator/command-architecture"
-+++
+---
+title: Query Architecture
+weight: 20
+description: >-
+  Queries represent **read-only requests** for data. The query side of `ArturRios.Mediator` supports two result shapes: a single `DataOutput<T>` for item lookups...
+---
 
 Queries represent **read-only requests** for data. The query side of `ArturRios.Mediator` supports two result shapes: a single `DataOutput<T>` for item lookups and a `PaginatedOutput<T>` for collection queries that need page metadata.
 

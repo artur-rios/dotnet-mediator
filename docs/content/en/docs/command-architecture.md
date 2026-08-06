@@ -1,11 +1,9 @@
-+++
-title = "Command Architecture"
-show_nav       = true
-nav_back_label = "Home"
-nav_back_url   = "/dotnet-mediator"
-nav_next_label = "Query Architecture"
-nav_next_url   = "/dotnet-mediator/query-architecture"
-+++
+---
+title: Command Architecture
+weight: 10
+description: >-
+  Commands represent **write intents** — creating, updating, or deleting state. The command side of `ArturRios.Mediator` enforces a strict...
+---
 
 Commands represent **write intents** — creating, updating, or deleting state. The command side of `ArturRios.Mediator` enforces a strict one-command-one-handler rule and isolates each execution in its own DI scope.
 
