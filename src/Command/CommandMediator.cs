@@ -47,6 +47,7 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TCommand">The command type to execute.</typeparam>
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="command">The command instance to execute.</param>
+    /// <param name="cancellationToken">Cancels the execution, and the dispatch itself.</param>
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
@@ -54,14 +55,22 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
     /// Thrown when no <see cref="ICommandHandlerAsync{TCommand, TOutput}"/> is registered for the
     /// requested command and output types.
     /// </exception>
-    public async Task<DataOutput<TOutput?>> ExecuteCommandAsync<TCommand, TOutput>(TCommand command)
+    /// <exception cref="OperationCanceledException">
+    /// <paramref name="cancellationToken"/> was already canceled. The check happens before the scope is
+    /// created, so a canceled dispatch costs nothing.
+    /// </exception>
+    public async Task<DataOutput<TOutput?>> ExecuteCommandAsync<TCommand, TOutput>(
+        TCommand command,
+        CancellationToken cancellationToken = default)
         where TCommand : BaseCommand
         where TOutput : CommandOutput
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var scoped = scopeFactory.CreateScope();
 
         var handler = scoped.ServiceProvider.GetRequiredService<ICommandHandlerAsync<TCommand, TOutput>>();
 
-        return await handler.HandleAsync(command).ConfigureAwait(false);
+        return await handler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
     }
 }

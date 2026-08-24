@@ -53,7 +53,7 @@ public interface ICommandHandlerAsync<in TCommand, TOutput>
     where TCommand : BaseCommand
     where TOutput  : CommandOutput
 {
-    Task<DataOutput<TOutput?>> HandleAsync(TCommand command);
+    Task<DataOutput<TOutput?>> HandleAsync(TCommand command, CancellationToken cancellationToken = default);
 }
 ```
 
@@ -94,20 +94,20 @@ classDiagram
 
     class ICommandHandlerAsync~TCommand TOutput~ {
         <<interface>>
-        +HandleAsync(command TCommand) Task~DataOutput~TOutput?~~
+        +HandleAsync(command TCommand, ct CancellationToken) Task~DataOutput~TOutput?~~
     }
 
     class CommandMediator {
         -IServiceScopeFactory _scopeFactory
         +ExecuteCommand(command TCommand) DataOutput~TOutput?~
-        +ExecuteCommandAsync(command TCommand) Task~DataOutput~TOutput?~~
+        +ExecuteCommandAsync(command TCommand, ct CancellationToken) Task~DataOutput~TOutput?~~
     }
 
     class CommandQueryMediator {
         -CommandMediator _commandMediator
         -QueryMediator _queryMediator
         +ExecuteCommand(command TCommand) DataOutput~TOutput?~
-        +ExecuteCommandAsync(command TCommand) Task~DataOutput~TOutput?~~
+        +ExecuteCommandAsync(command TCommand, ct CancellationToken) Task~DataOutput~TOutput?~~
     }
 
     ICommandHandler~TCommand TOutput~ ..> BaseCommand : constrains TCommand
@@ -155,7 +155,7 @@ sequenceDiagram
     CommandMediator->>DI: CreateScope()
     CommandMediator->>DI: GetRequiredService<ICommandHandlerAsync<TCommand, TOutput>>()
     DI-->>CommandMediator: handler
-    CommandMediator->>Handler: HandleAsync(command)
+    CommandMediator->>Handler: HandleAsync(command, ct)
     Handler-->>CommandMediator: Task<DataOutput<TOutput?>>
     CommandMediator->>DI: Dispose scope
     CommandMediator-->>Caller: DataOutput<TOutput?>
@@ -189,7 +189,9 @@ public class CreateProductHandler : ICommandHandlerAsync<CreateProductCommand, C
 
     public CreateProductHandler(IProductRepository repository) => _repository = repository;
 
-    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
+    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(
+        CreateProductCommand command,
+        CancellationToken cancellationToken = default)
     {
         var id = await _repository.InsertAsync(command.Name, command.Price);
         return DataOutput<CreateProductOutput?>.New.WithData(new CreateProductOutput { Id = id });

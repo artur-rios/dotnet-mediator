@@ -1,4 +1,4 @@
-using ArturRios.Output;
+﻿using ArturRios.Output;
 
 namespace ArturRios.Mediator.Query.Interfaces;
 
@@ -21,9 +21,10 @@ public interface IQueryHandlerAsync<in TQuery, TOutput>
     /// Executes the query asynchronously and returns its result.
     /// </summary>
     /// <param name="query">The query to execute.</param>
+    /// <param name="cancellationToken">Cancels the execution.</param>
     /// <returns>
     /// A task that resolves to a <see cref="DataOutput{T}"/> carrying the result payload
     /// along with success state, messages and any errors produced while handling the query.
     /// </returns>
-    Task<DataOutput<TOutput?>> HandleAsync(TQuery query);
+    Task<DataOutput<TOutput?>> HandleAsync(TQuery query, CancellationToken cancellationToken = default);
 }

@@ -47,6 +47,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TQuery">The query type to execute.</typeparam>
     /// <typeparam name="TOutput">The type of the items in the paginated result.</typeparam>
     /// <param name="query">The query instance to execute, including the requested page metadata.</param>
+    /// <param name="cancellationToken">Cancels the execution, and the dispatch itself.</param>
     /// <returns>
     /// A task that resolves to the <see cref="PaginatedOutput{T}"/> returned by the resolved handler.
     /// </returns>
@@ -54,15 +55,23 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// Thrown when no <see cref="IPaginatedQueryHandlerAsync{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
     /// </exception>
-    public async Task<PaginatedOutput<TOutput>> ExecutePaginatedQueryAsync<TQuery, TOutput>(TQuery query)
+    /// <exception cref="OperationCanceledException">
+    /// <paramref name="cancellationToken"/> was already canceled. The check happens before the scope is
+    /// created, so a canceled dispatch costs nothing.
+    /// </exception>
+    public async Task<PaginatedOutput<TOutput>> ExecutePaginatedQueryAsync<TQuery, TOutput>(
+        TQuery query,
+        CancellationToken cancellationToken = default)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var scoped = scopeFactory.CreateScope();
 
         var handler = scoped.ServiceProvider.GetRequiredService<IPaginatedQueryHandlerAsync<TQuery, TOutput>>();
 
-        return await handler.HandleAsync(query).ConfigureAwait(false);
+        return await handler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -93,6 +102,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TQuery">The query type to execute.</typeparam>
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="query">The query instance to execute.</param>
+    /// <param name="cancellationToken">Cancels the execution, and the dispatch itself.</param>
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
@@ -100,14 +110,22 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// Thrown when no <see cref="IQueryHandlerAsync{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
     /// </exception>
-    public async Task<DataOutput<TOutput?>> ExecuteQueryAsync<TQuery, TOutput>(TQuery query)
+    /// <exception cref="OperationCanceledException">
+    /// <paramref name="cancellationToken"/> was already canceled. The check happens before the scope is
+    /// created, so a canceled dispatch costs nothing.
+    /// </exception>
+    public async Task<DataOutput<TOutput?>> ExecuteQueryAsync<TQuery, TOutput>(
+        TQuery query,
+        CancellationToken cancellationToken = default)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var scoped = scopeFactory.CreateScope();
 
         var handler = scoped.ServiceProvider.GetRequiredService<IQueryHandlerAsync<TQuery, TOutput>>();
 
-        return await handler.HandleAsync(query).ConfigureAwait(false);
+        return await handler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -52,9 +52,11 @@ public class CreateProductOutput : CommandOutput
 ```csharp
 public class CreateProductHandler : ICommandHandlerAsync<CreateProductCommand, CreateProductOutput>
 {
-    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
+    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(
+        CreateProductCommand command,
+        CancellationToken cancellationToken = default)
     {
-        var id = await _repository.InsertAsync(command.Name, command.Price);
+        var id = await _repository.InsertAsync(command.Name, command.Price, cancellationToken);
         return DataOutput<CreateProductOutput?>.New.WithData(new CreateProductOutput { Id = id });
     }
 }
@@ -68,7 +70,9 @@ public class ProductsController(CommandQueryMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateProductCommand command)
     {
-        var result = await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command);
+        var result = await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
+            command, HttpContext.RequestAborted);
+
         return result.Success ? Ok(result.Data) : BadRequest(result.Errors);
     }
 }
@@ -88,6 +92,35 @@ For detailed architecture documentation and sequence diagrams see:
 
 - [Command Architecture](https://artur-rios.github.io/dotnet-mediator/docs/command-architecture/)
 - [Query Architecture](https://artur-rios.github.io/dotnet-mediator/docs/query-architecture/)
+
+## Upgrading to 2.0
+
+Every asynchronous entry point — on the mediators and on the handler contracts — now takes a
+`CancellationToken`. On the mediators the parameter is optional, so **calling code needs no change**:
+
+```csharp
+// still compiles, still means the same thing
+await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command);
+
+// and now this works
+await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command, ct);
+```
+
+**Handler implementations do need a change.** An interface method with a default value is still a new
+signature, so every `ICommandHandlerAsync`, `IQueryHandlerAsync` and `IPaginatedQueryHandlerAsync`
+implementation must add the parameter:
+
+```diff
+-    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
++    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(
++        CreateProductCommand command,
++        CancellationToken cancellationToken = default)
+```
+
+The synchronous `ICommandHandler`, `IQueryHandler` and `IPaginatedQueryHandler` contracts are unchanged.
+
+A token that is already canceled makes the mediator throw `OperationCanceledException` **before** it
+creates a dependency injection scope or resolves a handler, so a canceled dispatch costs nothing.
 
 ## Testing
 

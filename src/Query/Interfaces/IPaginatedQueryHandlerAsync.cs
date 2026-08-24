@@ -1,4 +1,4 @@
-using ArturRios.Output;
+﻿using ArturRios.Output;
 
 namespace ArturRios.Mediator.Query.Interfaces;
 
@@ -19,10 +19,11 @@ public interface IPaginatedQueryHandlerAsync<in TQuery, TOutput> where TQuery : 
     /// Executes the query asynchronously and returns a page of results.
     /// </summary>
     /// <param name="query">The query to execute, including the requested page metadata.</param>
+    /// <param name="cancellationToken">Cancels the execution.</param>
     /// <returns>
     /// A task that resolves to a <see cref="PaginatedOutput{T}"/> carrying the page of results
     /// along with pagination metadata, success state, messages and any errors produced while
     /// handling the query.
     /// </returns>
-    Task<PaginatedOutput<TOutput>> HandleAsync(TQuery query);
+    Task<PaginatedOutput<TOutput>> HandleAsync(TQuery query, CancellationToken cancellationToken = default);
 }

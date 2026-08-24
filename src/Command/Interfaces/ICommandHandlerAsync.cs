@@ -1,4 +1,4 @@
-using ArturRios.Output;
+﻿using ArturRios.Output;
 
 namespace ArturRios.Mediator.Command.Interfaces;
 
@@ -19,9 +19,10 @@ public interface ICommandHandlerAsync<in TCommand, TOutput> where TCommand : Med
     /// Executes the command asynchronously and returns its result.
     /// </summary>
     /// <param name="command">The command to execute.</param>
+    /// <param name="cancellationToken">Cancels the execution.</param>
     /// <returns>
     /// A task that resolves to a <see cref="DataOutput{T}"/> carrying the result payload
     /// along with success state, messages and any errors produced while handling the command.
     /// </returns>
-    Task<DataOutput<TOutput?>> HandleAsync(TCommand command);
+    Task<DataOutput<TOutput?>> HandleAsync(TCommand command, CancellationToken cancellationToken = default);
 }

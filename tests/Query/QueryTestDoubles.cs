@@ -1,4 +1,4 @@
-using ArturRios.Mediator.Query;
+﻿using ArturRios.Mediator.Query;
 using ArturRios.Mediator.Query.Interfaces;
 using ArturRios.Output;
 
@@ -44,13 +44,19 @@ public class SearchQueryHandlerAsync : IQueryHandlerAsync<SearchQuery, SearchQue
 {
     public bool WasCalled { get; private set; }
     public SearchQuery? ReceivedQuery { get; private set; }
+    public CancellationToken ReceivedToken { get; private set; }
 
-    public async Task<DataOutput<SearchQueryOutput?>> HandleAsync(SearchQuery query)
+    public async Task<DataOutput<SearchQueryOutput?>> HandleAsync(
+        SearchQuery query,
+        CancellationToken cancellationToken = default)
     {
         await Task.Yield();
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         WasCalled = true;
         ReceivedQuery = query;
+        ReceivedToken = cancellationToken;
 
         return DataOutput<SearchQueryOutput?>.New.WithData(new SearchQueryOutput { Value = query.Term });
     }
@@ -83,13 +89,19 @@ public class SearchPaginatedQueryHandlerAsync : IPaginatedQueryHandlerAsync<Sear
 {
     public bool WasCalled { get; private set; }
     public SearchQuery? ReceivedQuery { get; private set; }
+    public CancellationToken ReceivedToken { get; private set; }
 
-    public async Task<PaginatedOutput<SearchQueryOutput>> HandleAsync(SearchQuery query)
+    public async Task<PaginatedOutput<SearchQueryOutput>> HandleAsync(
+        SearchQuery query,
+        CancellationToken cancellationToken = default)
     {
         await Task.Yield();
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         WasCalled = true;
         ReceivedQuery = query;
+        ReceivedToken = cancellationToken;
 
         var output = PaginatedOutput<SearchQueryOutput>.New.WithPagination(query.PageNumber, 1, 1);
         output.AddItem(new SearchQueryOutput { Value = query.Term });
