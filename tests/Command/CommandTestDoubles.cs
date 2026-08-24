@@ -1,4 +1,4 @@
-using ArturRios.Mediator.Command;
+﻿using ArturRios.Mediator.Command;
 using ArturRios.Mediator.Command.Interfaces;
 using ArturRios.Output;
 
@@ -44,13 +44,19 @@ public class EchoCommandHandlerAsync : ICommandHandlerAsync<EchoCommand, EchoCom
 {
     public bool WasCalled { get; private set; }
     public EchoCommand? ReceivedCommand { get; private set; }
+    public CancellationToken ReceivedToken { get; private set; }
 
-    public async Task<DataOutput<EchoCommandOutput?>> HandleAsync(EchoCommand command)
+    public async Task<DataOutput<EchoCommandOutput?>> HandleAsync(
+        EchoCommand command,
+        CancellationToken cancellationToken = default)
     {
         await Task.Yield();
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         WasCalled = true;
         ReceivedCommand = command;
+        ReceivedToken = cancellationToken;
 
         return DataOutput<EchoCommandOutput?>.New.WithData(new EchoCommandOutput { Value = command.Value });
     }

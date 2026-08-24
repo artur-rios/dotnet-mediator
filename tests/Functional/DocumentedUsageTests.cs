@@ -1,4 +1,4 @@
-using ArturRios.Mediator.Command;
+﻿using ArturRios.Mediator.Command;
 using ArturRios.Mediator.Command.Interfaces;
 using ArturRios.Mediator.Query;
 using ArturRios.Mediator.Query.Interfaces;
@@ -74,7 +74,9 @@ public class DocumentedUsageTests
     private sealed class CreateProductHandler(IProductRepository repository)
         : ICommandHandlerAsync<CreateProductCommand, CreateProductOutput>
     {
-        public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
+        public async Task<DataOutput<CreateProductOutput?>> HandleAsync(
+            CreateProductCommand command,
+            CancellationToken cancellationToken = default)
         {
             var id = await repository.InsertAsync(command.Name, command.Price);
 
@@ -101,7 +103,9 @@ public class DocumentedUsageTests
     private sealed class GetProductHandler(IProductRepository repository)
         : IQueryHandlerAsync<GetProductQuery, GetProductOutput>
     {
-        public async Task<DataOutput<GetProductOutput?>> HandleAsync(GetProductQuery query)
+        public async Task<DataOutput<GetProductOutput?>> HandleAsync(
+            GetProductQuery query,
+            CancellationToken cancellationToken = default)
         {
             var product = await repository.FindByIdAsync(query.Id);
 
@@ -135,7 +139,9 @@ public class DocumentedUsageTests
     private sealed class ListProductsHandler(IProductRepository repository)
         : IPaginatedQueryHandlerAsync<ListProductsQuery, ProductListItem>
     {
-        public async Task<PaginatedOutput<ProductListItem>> HandleAsync(ListProductsQuery query)
+        public async Task<PaginatedOutput<ProductListItem>> HandleAsync(
+            ListProductsQuery query,
+            CancellationToken cancellationToken = default)
         {
             var (items, total) = await repository.ListAsync(query.NameFilter, query.PageNumber, query.PageSize);
 

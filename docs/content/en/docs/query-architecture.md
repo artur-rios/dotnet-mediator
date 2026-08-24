@@ -53,7 +53,7 @@ public interface IQueryHandlerAsync<in TQuery, TOutput>
     where TQuery  : BaseQuery
     where TOutput : QueryOutput
 {
-    Task<DataOutput<TOutput?>> HandleAsync(TQuery query);
+    Task<DataOutput<TOutput?>> HandleAsync(TQuery query, CancellationToken cancellationToken = default);
 }
 ```
 
@@ -73,7 +73,7 @@ public interface IPaginatedQueryHandlerAsync<in TQuery, TOutput>
     where TQuery  : BaseQuery
     where TOutput : QueryOutput
 {
-    Task<PaginatedOutput<TOutput>> HandleAsync(TQuery query);
+    Task<PaginatedOutput<TOutput>> HandleAsync(TQuery query, CancellationToken cancellationToken = default);
 }
 ```
 
@@ -118,7 +118,7 @@ classDiagram
 
     class IQueryHandlerAsync~TQuery TOutput~ {
         <<interface>>
-        +HandleAsync(query TQuery) Task~DataOutput~TOutput?~~
+        +HandleAsync(query TQuery, ct CancellationToken) Task~DataOutput~TOutput?~~
     }
 
     class IPaginatedQueryHandler~TQuery TOutput~ {
@@ -128,24 +128,24 @@ classDiagram
 
     class IPaginatedQueryHandlerAsync~TQuery TOutput~ {
         <<interface>>
-        +HandleAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+        +HandleAsync(query TQuery, ct CancellationToken) Task~PaginatedOutput~TOutput~~
     }
 
     class QueryMediator {
         -IServiceScopeFactory _scopeFactory
         +ExecuteQuery(query TQuery) DataOutput~TOutput?~
-        +ExecuteQueryAsync(query TQuery) Task~DataOutput~TOutput?~~
+        +ExecuteQueryAsync(query TQuery, ct CancellationToken) Task~DataOutput~TOutput?~~
         +ExecutePaginatedQuery(query TQuery) PaginatedOutput~TOutput~
-        +ExecutePaginatedQueryAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+        +ExecutePaginatedQueryAsync(query TQuery, ct CancellationToken) Task~PaginatedOutput~TOutput~~
     }
 
     class CommandQueryMediator {
         -CommandMediator _commandMediator
         -QueryMediator _queryMediator
         +ExecuteQuery(query TQuery) DataOutput~TOutput?~
-        +ExecuteQueryAsync(query TQuery) Task~DataOutput~TOutput?~~
+        +ExecuteQueryAsync(query TQuery, ct CancellationToken) Task~DataOutput~TOutput?~~
         +ExecutePaginatedQuery(query TQuery) PaginatedOutput~TOutput~
-        +ExecutePaginatedQueryAsync(query TQuery) Task~PaginatedOutput~TOutput~~
+        +ExecutePaginatedQueryAsync(query TQuery, ct CancellationToken) Task~PaginatedOutput~TOutput~~
     }
 
     IQueryHandler~TQuery TOutput~ ..> BaseQuery : constrains TQuery
@@ -180,7 +180,7 @@ sequenceDiagram
     QueryMediator->>DI: CreateScope()
     QueryMediator->>DI: GetRequiredService<IQueryHandlerAsync<TQuery, TOutput>>()
     DI-->>QueryMediator: handler
-    QueryMediator->>Handler: HandleAsync(query)
+    QueryMediator->>Handler: HandleAsync(query, ct)
     Handler-->>QueryMediator: Task<DataOutput<TOutput?>>
     QueryMediator->>DI: Dispose scope
     QueryMediator-->>Caller: DataOutput<TOutput?>
@@ -200,7 +200,7 @@ sequenceDiagram
     QueryMediator->>DI: CreateScope()
     QueryMediator->>DI: GetRequiredService<IPaginatedQueryHandlerAsync<TQuery, TOutput>>()
     DI-->>QueryMediator: handler
-    QueryMediator->>Handler: HandleAsync(query)
+    QueryMediator->>Handler: HandleAsync(query, ct)
     Handler-->>QueryMediator: Task<PaginatedOutput<TOutput>>
     QueryMediator->>DI: Dispose scope
     QueryMediator-->>Caller: PaginatedOutput<TOutput>
@@ -252,7 +252,9 @@ public class GetProductHandler : IQueryHandlerAsync<GetProductQuery, GetProductO
 
     public GetProductHandler(IProductRepository repository) => _repository = repository;
 
-    public async Task<DataOutput<GetProductOutput?>> HandleAsync(GetProductQuery query)
+    public async Task<DataOutput<GetProductOutput?>> HandleAsync(
+        GetProductQuery query,
+        CancellationToken cancellationToken = default)
     {
         var product = await _repository.FindByIdAsync(query.Id);
         return product is null
@@ -298,7 +300,9 @@ public class ListProductsHandler : IPaginatedQueryHandlerAsync<ListProductsQuery
 
     public ListProductsHandler(IProductRepository repository) => _repository = repository;
 
-    public async Task<PaginatedOutput<ProductListItem>> HandleAsync(ListProductsQuery query)
+    public async Task<PaginatedOutput<ProductListItem>> HandleAsync(
+        ListProductsQuery query,
+        CancellationToken cancellationToken = default)
     {
         var (items, total) = await _repository.ListAsync(
             query.NameFilter, query.PageNumber, query.PageSize);

@@ -44,14 +44,19 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TCommand">The command type to execute.</typeparam>
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="command">The command instance to execute.</param>
+    /// <param name="cancellationToken">Cancels the execution, and the dispatch itself.</param>
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
-    public async Task<DataOutput<TOutput?>> ExecuteCommandAsync<TCommand, TOutput>(TCommand command)
+    public async Task<DataOutput<TOutput?>> ExecuteCommandAsync<TCommand, TOutput>(
+        TCommand command,
+        CancellationToken cancellationToken = default)
         where TCommand : BaseCommand
         where TOutput : CommandOutput
     {
-        return await _commandMediator.ExecuteCommandAsync<TCommand, TOutput>(command).ConfigureAwait(false);
+        return await _commandMediator
+            .ExecuteCommandAsync<TCommand, TOutput>(command, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
@@ -74,14 +79,19 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TQuery">The query type to execute.</typeparam>
     /// <typeparam name="TOutput">The type of the items in the paginated result.</typeparam>
     /// <param name="query">The query instance to execute, including the requested page metadata.</param>
+    /// <param name="cancellationToken">Cancels the execution, and the dispatch itself.</param>
     /// <returns>
     /// A task that resolves to the <see cref="PaginatedOutput{T}"/> returned by the resolved handler.
     /// </returns>
-    public async Task<PaginatedOutput<TOutput>> ExecutePaginatedQueryAsync<TQuery, TOutput>(TQuery query)
+    public async Task<PaginatedOutput<TOutput>> ExecutePaginatedQueryAsync<TQuery, TOutput>(
+        TQuery query,
+        CancellationToken cancellationToken = default)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
-        return await _queryMediator.ExecutePaginatedQueryAsync<TQuery, TOutput>(query).ConfigureAwait(false);
+        return await _queryMediator
+            .ExecutePaginatedQueryAsync<TQuery, TOutput>(query, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
@@ -104,13 +114,18 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TQuery">The query type to execute.</typeparam>
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="query">The query instance to execute.</param>
+    /// <param name="cancellationToken">Cancels the execution, and the dispatch itself.</param>
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
-    public async Task<DataOutput<TOutput?>> ExecuteQueryAsync<TQuery, TOutput>(TQuery query)
+    public async Task<DataOutput<TOutput?>> ExecuteQueryAsync<TQuery, TOutput>(
+        TQuery query,
+        CancellationToken cancellationToken = default)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
-        return await _queryMediator.ExecuteQueryAsync<TQuery, TOutput>(query).ConfigureAwait(false);
+        return await _queryMediator
+            .ExecuteQueryAsync<TQuery, TOutput>(query, cancellationToken)
+            .ConfigureAwait(false);
     }
 }
