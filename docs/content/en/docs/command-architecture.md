@@ -192,7 +192,7 @@ public class CreateProductHandler : ICommandHandlerAsync<CreateProductCommand, C
     public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
     {
         var id = await _repository.InsertAsync(command.Name, command.Price);
-        return DataOutput<CreateProductOutput?>.Success(new CreateProductOutput { Id = id });
+        return DataOutput<CreateProductOutput?>.New.WithData(new CreateProductOutput { Id = id });
     }
 }
 ```
@@ -210,7 +210,7 @@ builder.Services.AddScoped<ICommandHandlerAsync<CreateProductCommand, CreateProd
 var result = await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
     new CreateProductCommand { Name = "Widget", Price = 9.99m });
 
-if (result.IsSuccess)
+if (result.Success)
     Console.WriteLine($"Created: {result.Data!.Id}");
 ```
 

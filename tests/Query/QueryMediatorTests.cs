@@ -1,9 +1,10 @@
-using ArturRios.Mediator.Query;
+﻿using ArturRios.Mediator.Query;
 using ArturRios.Mediator.Query.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ArturRios.Mediator.Tests.Query;
 
+[Trait("Category", "Unit")]
 public class QueryMediatorTests
 {
     private static QueryMediator BuildMediator(IServiceProvider provider) =>
@@ -60,6 +61,7 @@ public class QueryMediatorTests
         Assert.True(handler.WasCalled);
         Assert.Same(query, handler.ReceivedQuery);
         Assert.Equal(2, result.PageNumber);
+        Assert.NotNull(result.Data);
         Assert.Single(result.Data);
         Assert.Equal("page", result.Data[0].Value);
     }
@@ -79,6 +81,7 @@ public class QueryMediatorTests
         Assert.True(handler.WasCalled);
         Assert.Same(query, handler.ReceivedQuery);
         Assert.Equal(3, result.PageNumber);
+        Assert.NotNull(result.Data);
         Assert.Single(result.Data);
         Assert.Equal("page", result.Data[0].Value);
     }

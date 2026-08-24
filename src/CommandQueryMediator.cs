@@ -1,4 +1,4 @@
-using ArturRios.Mediator.Command;
+﻿using ArturRios.Mediator.Command;
 using ArturRios.Mediator.Query;
 using ArturRios.Output;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +51,7 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
         where TCommand : BaseCommand
         where TOutput : CommandOutput
     {
-        return await _commandMediator.ExecuteCommandAsync<TCommand, TOutput>(command);
+        return await _commandMediator.ExecuteCommandAsync<TCommand, TOutput>(command).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
-        return await _queryMediator.ExecutePaginatedQueryAsync<TQuery, TOutput>(query);
+        return await _queryMediator.ExecutePaginatedQueryAsync<TQuery, TOutput>(query).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -111,6 +111,6 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
-        return await _queryMediator.ExecuteQueryAsync<TQuery, TOutput>(query);
+        return await _queryMediator.ExecuteQueryAsync<TQuery, TOutput>(query).ConfigureAwait(false);
     }
 }

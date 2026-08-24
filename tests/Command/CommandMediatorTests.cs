@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ArturRios.Mediator.Tests.Command;
 
+[Trait("Category", "Unit")]
 public class CommandMediatorTests
 {
     private static CommandMediator BuildMediator(IServiceProvider provider) =>

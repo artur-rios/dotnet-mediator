@@ -1,4 +1,4 @@
-using ArturRios.Mediator.Query.Interfaces;
+﻿using ArturRios.Mediator.Query.Interfaces;
 using ArturRios.Output;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -62,7 +62,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
 
         var handler = scoped.ServiceProvider.GetRequiredService<IPaginatedQueryHandlerAsync<TQuery, TOutput>>();
 
-        return await handler.HandleAsync(query);
+        return await handler.HandleAsync(query).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -108,6 +108,6 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
 
         var handler = scoped.ServiceProvider.GetRequiredService<IQueryHandlerAsync<TQuery, TOutput>>();
 
-        return await handler.HandleAsync(query);
+        return await handler.HandleAsync(query).ConfigureAwait(false);
     }
 }

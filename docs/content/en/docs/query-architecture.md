@@ -256,8 +256,8 @@ public class GetProductHandler : IQueryHandlerAsync<GetProductQuery, GetProductO
     {
         var product = await _repository.FindByIdAsync(query.Id);
         return product is null
-            ? DataOutput<GetProductOutput?>.Failure("Product not found.")
-            : DataOutput<GetProductOutput?>.Success(new GetProductOutput
+            ? DataOutput<GetProductOutput?>.New.WithError("Product not found.")
+            : DataOutput<GetProductOutput?>.New.WithData(new GetProductOutput
               {
                   Id    = product.Id,
                   Name  = product.Name,
@@ -303,9 +303,9 @@ public class ListProductsHandler : IPaginatedQueryHandlerAsync<ListProductsQuery
         var (items, total) = await _repository.ListAsync(
             query.NameFilter, query.PageNumber, query.PageSize);
 
-        return PaginatedOutput<ProductListItem>.Success(
-            items.Select(p => new ProductListItem { Id = p.Id, Name = p.Name, Price = p.Price }),
-            total, query.PageNumber, query.PageSize);
+        return PaginatedOutput<ProductListItem>.New
+            .WithData(items.Select(p => new ProductListItem { Id = p.Id, Name = p.Name, Price = p.Price }).ToList())
+            .WithPagination(query.PageNumber, query.PageSize, total);
     }
 }
 
