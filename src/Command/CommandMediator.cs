@@ -1,4 +1,4 @@
-using ArturRios.Mediator.Command.Interfaces;
+﻿using ArturRios.Mediator.Command.Interfaces;
 using ArturRios.Output;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -62,6 +62,6 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
 
         var handler = scoped.ServiceProvider.GetRequiredService<ICommandHandlerAsync<TCommand, TOutput>>();
 
-        return await handler.HandleAsync(command);
+        return await handler.HandleAsync(command).ConfigureAwait(false);
     }
 }

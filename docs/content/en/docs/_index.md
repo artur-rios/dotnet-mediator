@@ -57,7 +57,7 @@ public class CreateProductHandler : ICommandHandlerAsync<CreateProductCommand, C
     public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
     {
         var id = await _repository.InsertAsync(command.Name, command.Price);
-        return DataOutput<CreateProductOutput?>.Success(new CreateProductOutput { Id = id });
+        return DataOutput<CreateProductOutput?>.New.WithData(new CreateProductOutput { Id = id });
     }
 }
 ```
@@ -71,7 +71,7 @@ public class ProductsController(CommandQueryMediator mediator) : ControllerBase
     public async Task<IActionResult> Create(CreateProductCommand command)
     {
         var result = await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command);
-        return result.IsSuccess ? Ok(result.Data) : BadRequest(result.Errors);
+        return result.Success ? Ok(result.Data) : BadRequest(result.Errors);
     }
 }
 ```
@@ -88,8 +88,22 @@ The library ships three mediator classes and a full set of handler interfaces:
 
 For detailed architecture documentation and sequence diagrams see:
 
-- [Command Architecture](https://artur-rios.github.io/dotnet-mediator/command-architecture/)
-- [Query Architecture](https://artur-rios.github.io/dotnet-mediator/query-architecture/)
+- [Command Architecture](https://artur-rios.github.io/dotnet-mediator/docs/command-architecture/)
+- [Query Architecture](https://artur-rios.github.io/dotnet-mediator/docs/query-architecture/)
+
+## Testing
+
+The test suite is xUnit, and every test is named with the Given / When / Then pattern. Every test class
+carries a `Category` trait, so the two kinds can be run — and reported — separately:
+
+```bash
+dotnet test src/ArturRios.Mediator.sln --filter "Category=Unit"
+dotnet test src/ArturRios.Mediator.sln --filter "Category=Functional"
+```
+
+Unit tests exercise the code in isolation against test doubles.
+Functional tests execute the commands, queries and handlers the documentation shows, verbatim, through a real service provider - so a sample that drifts from the API stops the build.
+CI runs the two as separate jobs, and both must pass before a pull request can be merged.
 
 ## Versioning
 

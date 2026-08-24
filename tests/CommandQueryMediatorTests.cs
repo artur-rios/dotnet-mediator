@@ -1,4 +1,4 @@
-using ArturRios.Mediator.Command.Interfaces;
+﻿using ArturRios.Mediator.Command.Interfaces;
 using ArturRios.Mediator.Query.Interfaces;
 using ArturRios.Mediator.Tests.Command;
 using ArturRios.Mediator.Tests.Query;
@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ArturRios.Mediator.Tests;
 
+[Trait("Category", "Unit")]
 public class CommandQueryMediatorTests
 {
     private static CommandQueryMediator BuildMediator(IServiceProvider provider) =>
@@ -78,6 +79,7 @@ public class CommandQueryMediatorTests
         var result = mediator.ExecutePaginatedQuery<SearchQuery, SearchQueryOutput>(new SearchQuery { Term = "qry" });
 
         Assert.True(handler.WasCalled);
+        Assert.NotNull(result.Data);
         Assert.Single(result.Data);
         Assert.Equal("qry", result.Data[0].Value);
     }
@@ -93,6 +95,7 @@ public class CommandQueryMediatorTests
         var result = await mediator.ExecutePaginatedQueryAsync<SearchQuery, SearchQueryOutput>(new SearchQuery { Term = "qry" });
 
         Assert.True(handler.WasCalled);
+        Assert.NotNull(result.Data);
         Assert.Single(result.Data);
         Assert.Equal("qry", result.Data[0].Value);
     }
