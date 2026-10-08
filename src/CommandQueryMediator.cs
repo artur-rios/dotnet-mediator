@@ -1,5 +1,7 @@
 ﻿using ArturRios.Mediator.Command;
+using ArturRios.Mediator.Command.Interfaces;
 using ArturRios.Mediator.Query;
+using ArturRios.Mediator.Query.Interfaces;
 using ArturRios.Output;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +33,8 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="command">The command instance to execute.</param>
     /// <returns>The <see cref="DataOutput{T}"/> returned by the resolved handler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="command"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No <see cref="ICommandHandler{TCommand, TOutput}"/> is registered for the requested types.</exception>
     public DataOutput<TOutput?> ExecuteCommand<TCommand, TOutput>(TCommand command)
         where TCommand : BaseCommand
         where TOutput : CommandOutput
@@ -48,6 +52,9 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="command"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No <see cref="ICommandHandlerAsync{TCommand, TOutput}"/> is registered for the requested types.</exception>
+    /// <exception cref="OperationCanceledException"><paramref name="cancellationToken"/> was already canceled.</exception>
     public async Task<DataOutput<TOutput?>> ExecuteCommandAsync<TCommand, TOutput>(
         TCommand command,
         CancellationToken cancellationToken = default)
@@ -66,6 +73,8 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TOutput">The type of the items in the paginated result.</typeparam>
     /// <param name="query">The query instance to execute, including the requested page metadata.</param>
     /// <returns>The <see cref="PaginatedOutput{T}"/> returned by the resolved handler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No <see cref="IPaginatedQueryHandler{TQuery, TOutput}"/> is registered for the requested types.</exception>
     public PaginatedOutput<TOutput> ExecutePaginatedQuery<TQuery, TOutput>(TQuery query)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
@@ -83,6 +92,9 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <returns>
     /// A task that resolves to the <see cref="PaginatedOutput{T}"/> returned by the resolved handler.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No <see cref="IPaginatedQueryHandlerAsync{TQuery, TOutput}"/> is registered for the requested types.</exception>
+    /// <exception cref="OperationCanceledException"><paramref name="cancellationToken"/> was already canceled.</exception>
     public async Task<PaginatedOutput<TOutput>> ExecutePaginatedQueryAsync<TQuery, TOutput>(
         TQuery query,
         CancellationToken cancellationToken = default)
@@ -101,6 +113,8 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="query">The query instance to execute.</param>
     /// <returns>The <see cref="DataOutput{T}"/> returned by the resolved handler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No <see cref="IQueryHandler{TQuery, TOutput}"/> is registered for the requested types.</exception>
     public DataOutput<TOutput?> ExecuteQuery<TQuery, TOutput>(TQuery query)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
@@ -118,6 +132,9 @@ public class CommandQueryMediator(IServiceScopeFactory scopeFactory)
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No <see cref="IQueryHandlerAsync{TQuery, TOutput}"/> is registered for the requested types.</exception>
+    /// <exception cref="OperationCanceledException"><paramref name="cancellationToken"/> was already canceled.</exception>
     public async Task<DataOutput<TOutput?>> ExecuteQueryAsync<TQuery, TOutput>(
         TQuery query,
         CancellationToken cancellationToken = default)

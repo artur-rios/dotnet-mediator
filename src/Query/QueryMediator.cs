@@ -26,6 +26,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TOutput">The type of the items in the paginated result.</typeparam>
     /// <param name="query">The query instance to execute, including the requested page metadata.</param>
     /// <returns>The <see cref="PaginatedOutput{T}"/> returned by the resolved handler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when no <see cref="IPaginatedQueryHandler{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
@@ -34,6 +35,8 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
+        ArgumentNullException.ThrowIfNull(query);
+
         using var scoped = scopeFactory.CreateScope();
 
         var handler = scoped.ServiceProvider.GetRequiredService<IPaginatedQueryHandler<TQuery, TOutput>>();
@@ -51,6 +54,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// <returns>
     /// A task that resolves to the <see cref="PaginatedOutput{T}"/> returned by the resolved handler.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when no <see cref="IPaginatedQueryHandlerAsync{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
@@ -65,9 +69,13 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
+        ArgumentNullException.ThrowIfNull(query);
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var scoped = scopeFactory.CreateScope();
+        // Disposed asynchronously: a scoped dependency that only implements IAsyncDisposable makes a
+        // synchronous Dispose throw, after the handler has already run.
+        var scoped = scopeFactory.CreateAsyncScope();
+        await using var scopeDisposal = scoped.ConfigureAwait(false);
 
         var handler = scoped.ServiceProvider.GetRequiredService<IPaginatedQueryHandlerAsync<TQuery, TOutput>>();
 
@@ -81,6 +89,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="query">The query instance to execute.</param>
     /// <returns>The <see cref="DataOutput{T}"/> returned by the resolved handler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when no <see cref="IQueryHandler{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
@@ -89,6 +98,8 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
+        ArgumentNullException.ThrowIfNull(query);
+
         using var scoped = scopeFactory.CreateScope();
 
         var handler = scoped.ServiceProvider.GetRequiredService<IQueryHandler<TQuery, TOutput>>();
@@ -106,6 +117,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when no <see cref="IQueryHandlerAsync{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
@@ -120,9 +132,13 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
     {
+        ArgumentNullException.ThrowIfNull(query);
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var scoped = scopeFactory.CreateScope();
+        // Disposed asynchronously: a scoped dependency that only implements IAsyncDisposable makes a
+        // synchronous Dispose throw, after the handler has already run.
+        var scoped = scopeFactory.CreateAsyncScope();
+        await using var scopeDisposal = scoped.ConfigureAwait(false);
 
         var handler = scoped.ServiceProvider.GetRequiredService<IQueryHandlerAsync<TQuery, TOutput>>();
 
