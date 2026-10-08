@@ -1,7 +1,7 @@
 # Command Mediator
 
 [![Docs](https://img.shields.io/badge/docs-website-blue)](https://artur-rios.github.io/dotnet-mediator)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/artur-rios/dotnet-mediator/blob/main/LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/ArturRios.Mediator.svg)](https://www.nuget.org/packages/ArturRios.Mediator)
 
 `ArturRios.Mediator` is a lightweight .NET library that implements the [Mediator pattern](https://refactoring.guru/design-patterns/mediator) on top of the built-in dependency injection container, providing a clean CQRS-style separation between **commands** (write operations) and **queries** (read operations).
@@ -93,82 +93,21 @@ For detailed architecture documentation and sequence diagrams see:
 - [Command Architecture](https://artur-rios.github.io/dotnet-mediator/docs/command-architecture/)
 - [Query Architecture](https://artur-rios.github.io/dotnet-mediator/docs/query-architecture/)
 
-## Upgrading to 2.0
+## Upgrading
 
-Every asynchronous entry point — on the mediators and on the handler contracts — now takes a
-`CancellationToken`. On the mediators the parameter is optional, so **calling code needs no change**:
+Releases that need changes in consuming code carry an upgrade guide in the changelog:
 
-```csharp
-// still compiles, still means the same thing
-await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command);
+- From 1.x to 2.0: [Upgrading from 1.x to 2.0](https://github.com/artur-rios/dotnet-mediator/blob/main/CHANGELOG.md#upgrading-from-1x-to-20)
 
-// and now this works
-await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command, ct);
-```
+## Changelog
 
-**Handler implementations do need a change.** An interface method with a default value is still a new
-signature, so every `ICommandHandlerAsync`, `IQueryHandlerAsync` and `IPaginatedQueryHandlerAsync`
-implementation must add the parameter:
+Notable changes in each release are recorded in [CHANGELOG.md](https://github.com/artur-rios/dotnet-mediator/blob/main/CHANGELOG.md). Releases follow
+[Semantic Versioning](https://semver.org/).
 
-```diff
--    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
-+    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(
-+        CreateProductCommand command,
-+        CancellationToken cancellationToken = default)
-```
+## Contributing
 
-The synchronous `ICommandHandler`, `IQueryHandler` and `IPaginatedQueryHandler` contracts are unchanged.
-
-A token that is already canceled makes the mediator throw `OperationCanceledException` **before** it
-creates a dependency injection scope or resolves a handler, so a canceled dispatch costs nothing.
-
-## Testing
-
-The test suite is xUnit, and every test is named with the Given / When / Then pattern. Every test class
-carries a `Category` trait, so the two kinds can be run — and reported — separately:
-
-```bash
-dotnet test src/ArturRios.Mediator.sln --filter "Category=Unit"
-dotnet test src/ArturRios.Mediator.sln --filter "Category=Functional"
-```
-
-Unit tests exercise the code in isolation against test doubles.
-Functional tests execute the commands, queries and handlers the documentation shows, verbatim, through a real service provider - so a sample that drifts from the API stops the build.
-CI runs the two as separate jobs, and both must pass before a pull request can be merged.
-
-## Branching and releases
-
-`develop` is the integration branch and the base for all new work; `main` only holds released code.
-
-1. Branch off `develop` — `feature/<name>` for features, `fix/<name>` for fixes (`chore/`, `refactor/`, `docs/`,
-   `ci/`, `test/`, `perf/` and `build/` are accepted too) — and open a pull request back into `develop`.
-2. To release, cut `release/<version>` from `develop`, set `<Version>` in `src/ArturRios.Mediator.csproj` to that version
-   and open a pull request into `main`. Only `release/*` branches can be merged into `main`.
-3. Once it is merged, tag the merge commit on `main` with the version. Pushing the tag publishes the package to
-   nuget.org and GitHub Packages:
-
-   ```bash
-   git switch main && git pull
-   git tag <version> && git push origin <version>
-   ```
-
-4. Open a pull request from `main` into `develop` to bring the release back into the integration branch.
-
-Pull requests into `develop` and `main` must pass the tests and the branch policy check. Only the repository owner can
-push version tags, and the publish workflow rejects tags that do not point at a commit on `main`.
-
-## Versioning
-
-Semantic Versioning (SemVer). Breaking changes result in a new major version. New methods or non-breaking behavior
-changes increment the minor version; fixes or tweaks increment the patch.
-
-## Build, test and publish
-
-Use the official [.NET CLI](https://learn.microsoft.com/en-us/dotnet/core/tools/) to build, test and publish the project and Git for source control.
-If you want, optional helper toolsets I built to facilitate these tasks are available:
-
-- [Dotnet Tools](https://github.com/artur-rios/dotnet-tools)
-- [Python Dotnet Tools](https://github.com/artur-rios/python-dotnet-tools)
+Building from source, running the tests, the branching model and the release process are described in
+[CONTRIBUTING.md](https://github.com/artur-rios/dotnet-mediator/blob/main/CONTRIBUTING.md).
 
 ## Legal Details
 

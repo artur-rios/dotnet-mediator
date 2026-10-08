@@ -77,7 +77,7 @@ public interface IPaginatedQueryHandlerAsync<in TQuery, TOutput>
 }
 ```
 
-Use for queries that return a **page of results** together with pagination metadata (`TotalCount`, `TotalPages`, etc. provided by `PaginatedOutput<T>`).
+Use for queries that return a **page of results** together with pagination metadata (`PageNumber`, `PageSize`, `TotalItems` and `TotalPages`, provided by `PaginatedOutput<T>`).
 
 ### QueryMediator
 
@@ -85,13 +85,15 @@ Use for queries that return a **page of results** together with pagination metad
 public class QueryMediator(IServiceScopeFactory scopeFactory)
 {
     public DataOutput<TOutput?>         ExecuteQuery              <TQuery, TOutput>(TQuery query) ...
-    public Task<DataOutput<TOutput?>>   ExecuteQueryAsync         <TQuery, TOutput>(TQuery query) ...
+    public Task<DataOutput<TOutput?>>   ExecuteQueryAsync         <TQuery, TOutput>(TQuery query,
+                                            CancellationToken cancellationToken = default) ...
     public PaginatedOutput<TOutput>     ExecutePaginatedQuery     <TQuery, TOutput>(TQuery query) ...
-    public Task<PaginatedOutput<TOutput>> ExecutePaginatedQueryAsync<TQuery, TOutput>(TQuery query) ...
+    public Task<PaginatedOutput<TOutput>> ExecutePaginatedQueryAsync<TQuery, TOutput>(TQuery query,
+                                            CancellationToken cancellationToken = default) ...
 }
 ```
 
-For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope.
+For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope — asynchronously on the asynchronous methods, so a handler can depend on a scoped service that only implements `IAsyncDisposable`. The asynchronous methods forward the token to the handler, and an already-canceled token throws `OperationCanceledException` before the scope is created. A null query throws `ArgumentNullException` before the scope is created.
 
 ---
 
@@ -176,7 +178,7 @@ sequenceDiagram
     participant DI as DI Container (scope)
     participant Handler as IQueryHandlerAsync
 
-    Caller->>QueryMediator: ExecuteQueryAsync<TQuery, TOutput>(query)
+    Caller->>QueryMediator: ExecuteQueryAsync<TQuery, TOutput>(query, ct)
     QueryMediator->>DI: CreateScope()
     QueryMediator->>DI: GetRequiredService<IQueryHandlerAsync<TQuery, TOutput>>()
     DI-->>QueryMediator: handler
@@ -195,7 +197,7 @@ sequenceDiagram
     participant DI as DI Container (scope)
     participant Handler as IPaginatedQueryHandlerAsync
 
-    Caller->>QueryMediator: ExecutePaginatedQueryAsync<TQuery, TOutput>(query)
+    Caller->>QueryMediator: ExecutePaginatedQueryAsync<TQuery, TOutput>(query, ct)
     note over Caller,QueryMediator: query.PageNumber and query.PageSize are set
     QueryMediator->>DI: CreateScope()
     QueryMediator->>DI: GetRequiredService<IPaginatedQueryHandlerAsync<TQuery, TOutput>>()
