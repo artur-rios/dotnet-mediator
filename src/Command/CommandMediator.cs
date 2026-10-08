@@ -26,6 +26,7 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
     /// <typeparam name="TOutput">The type of the data payload produced by the handler.</typeparam>
     /// <param name="command">The command instance to execute.</param>
     /// <returns>The <see cref="DataOutput{T}"/> returned by the resolved handler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="command"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when no <see cref="ICommandHandler{TCommand, TOutput}"/> is registered for the
     /// requested command and output types.
@@ -34,6 +35,8 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
         where TCommand : BaseCommand
         where TOutput : CommandOutput
     {
+        ArgumentNullException.ThrowIfNull(command);
+
         using var scoped = scopeFactory.CreateScope();
 
         var handler = scoped.ServiceProvider.GetRequiredService<ICommandHandler<TCommand, TOutput>>();
@@ -51,6 +54,7 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
     /// <returns>
     /// A task that resolves to the <see cref="DataOutput{T}"/> returned by the resolved handler.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="command"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when no <see cref="ICommandHandlerAsync{TCommand, TOutput}"/> is registered for the
     /// requested command and output types.
@@ -65,9 +69,13 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
         where TCommand : BaseCommand
         where TOutput : CommandOutput
     {
+        ArgumentNullException.ThrowIfNull(command);
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var scoped = scopeFactory.CreateScope();
+        // Disposed asynchronously: a scoped dependency that only implements IAsyncDisposable makes a
+        // synchronous Dispose throw, after the handler has already run.
+        var scoped = scopeFactory.CreateAsyncScope();
+        await using var scopeDisposal = scoped.ConfigureAwait(false);
 
         var handler = scoped.ServiceProvider.GetRequiredService<ICommandHandlerAsync<TCommand, TOutput>>();
 
