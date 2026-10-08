@@ -95,61 +95,11 @@ For detailed architecture documentation and sequence diagrams see:
 - [Command Architecture](https://artur-rios.github.io/dotnet-mediator/docs/command-architecture/)
 - [Query Architecture](https://artur-rios.github.io/dotnet-mediator/docs/query-architecture/)
 
-## Upgrading to 2.0
+## Upgrading
 
-Every asynchronous entry point — on the mediators and on the handler contracts — now takes a
-`CancellationToken`. On the mediators the parameter is optional, so **calling code needs no change**:
+Releases that need changes in consuming code carry an upgrade guide in the changelog:
 
-```csharp
-// still compiles, still means the same thing
-await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command);
-
-// and now this works
-await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(command, ct);
-```
-
-**Handler implementations do need a change.** An interface method with a default value is still a new
-signature, so every `ICommandHandlerAsync`, `IQueryHandlerAsync` and `IPaginatedQueryHandlerAsync`
-implementation must add the parameter:
-
-```diff
--    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(CreateProductCommand command)
-+    public async Task<DataOutput<CreateProductOutput?>> HandleAsync(
-+        CreateProductCommand command,
-+        CancellationToken cancellationToken = default)
-```
-
-The synchronous `ICommandHandler`, `IQueryHandler` and `IPaginatedQueryHandler` contracts are unchanged.
-
-A token that is already canceled makes the mediator throw `OperationCanceledException` **before** it
-creates a dependency injection scope or resolves a handler, so a canceled dispatch costs nothing.
-
-## Testing
-
-The test suite is xUnit, and every test is named with the Given / When / Then pattern. Every test class
-carries a `Category` trait, so the two kinds can be run — and reported — separately:
-
-```bash
-dotnet test src/ArturRios.Mediator.sln --filter "Category=Unit"
-dotnet test src/ArturRios.Mediator.sln --filter "Category=Functional"
-```
-
-Unit tests exercise the code in isolation against test doubles.
-Functional tests execute the commands, queries and handlers the documentation shows, verbatim, through a real service provider - so a sample that drifts from the API stops the build.
-CI runs the two as separate jobs, and both must pass before a pull request can be merged.
-
-## Versioning
-
-Semantic Versioning (SemVer). Breaking changes result in a new major version. New methods or non-breaking behavior
-changes increment the minor version; fixes or tweaks increment the patch.
-
-## Build, test and publish
-
-Use the official [.NET CLI](https://learn.microsoft.com/en-us/dotnet/core/tools/) to build, test and publish the project and Git for source control.
-If you want, optional helper toolsets I built to facilitate these tasks are available:
-
-- [Dotnet Tools](https://github.com/artur-rios/dotnet-tools)
-- [Python Dotnet Tools](https://github.com/artur-rios/python-dotnet-tools)
+- From 1.x to 2.0: [Upgrading from 1.x to 2.0]({{< relref "changelog#upgrading-from-1x-to-20" >}})
 
 ## Legal Details
 
