@@ -13,7 +13,7 @@
     <IncludeSymbols>false</IncludeSymbols>
     <Nullable>enable</Nullable>
     <PackageId>ArturRios.Mediator</PackageId>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://artur-rios.github.io/dotnet-mediator/</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>dotnet;mediator;cqrs;command;query</PackageTags>
@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ArturRios.Output" Version="3.2.0" />
