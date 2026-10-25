@@ -1,8 +1,10 @@
 # Command Mediator
 
-[![Docs](https://img.shields.io/badge/docs-website-blue)](https://artur-rios.github.io/dotnet-mediator)
+[![Docs](https://img.shields.io/badge/docs-website-blue)](https://docs.artur-rios.tech/dotnet-mediator)
 [![License: Attribution](https://img.shields.io/badge/License-Attribution-blue.svg)](https://github.com/artur-rios/dotnet-mediator/blob/main/LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/ArturRios.Mediator.svg)](https://www.nuget.org/packages/ArturRios.Mediator)
+
+This repository lives at <https://git.techcraftsmen.net/artur-rios/dotnet-mediator>. The GitHub repository is a read-only mirror of it.
 
 `ArturRios.Mediator` is a lightweight .NET library that implements the [Mediator pattern](https://refactoring.guru/design-patterns/mediator) on top of the built-in dependency injection container, providing a clean CQRS-style separation between **commands** (write operations) and **queries** (read operations).
 
@@ -90,8 +92,8 @@ The library ships three mediator classes and a full set of handler interfaces:
 
 For detailed architecture documentation and sequence diagrams see:
 
-- [Command Architecture](https://artur-rios.github.io/dotnet-mediator/docs/command-architecture/)
-- [Query Architecture](https://artur-rios.github.io/dotnet-mediator/docs/query-architecture/)
+- [Command Architecture](https://docs.artur-rios.tech/dotnet-mediator/docs/command-architecture/)
+- [Query Architecture](https://docs.artur-rios.tech/dotnet-mediator/docs/query-architecture/)
 
 ## Upgrading
 

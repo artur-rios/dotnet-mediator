@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Every `Execute*` method of `CommandMediator`, `QueryMediator` and `CommandQueryMediator` throws
   `ArgumentNullException` for a null command or query, before a dependency injection scope is created, instead of
   passing `null` on to the handler.
+- The package's project URL is the documentation site's new address, `https://docs.artur-rios.tech/dotnet-mediator`, since the
+  site moved from GitHub Pages.
 
 ### Fixed
 

@@ -92,8 +92,8 @@ The library ships three mediator classes and a full set of handler interfaces:
 
 For detailed architecture documentation and sequence diagrams see:
 
-- [Command Architecture](https://artur-rios.github.io/dotnet-mediator/docs/command-architecture/)
-- [Query Architecture](https://artur-rios.github.io/dotnet-mediator/docs/query-architecture/)
+- [Command Architecture](https://docs.artur-rios.tech/dotnet-mediator/docs/command-architecture/)
+- [Query Architecture](https://docs.artur-rios.tech/dotnet-mediator/docs/query-architecture/)
 
 ## Upgrading
 
