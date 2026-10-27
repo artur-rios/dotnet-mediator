@@ -14,7 +14,7 @@
     <Nullable>enable</Nullable>
     <PackageId>ArturRios.Mediator</PackageId>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://artur-rios.github.io/dotnet-mediator/</PackageProjectUrl>
+    <PackageProjectUrl>https://docs.artur-rios.tech/dotnet-mediator/</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>dotnet;mediator;cqrs;command;query</PackageTags>
     <RepositoryUrl>https://github.com/artur-rios/dotnet-mediator</RepositoryUrl>
