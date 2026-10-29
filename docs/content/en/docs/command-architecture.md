@@ -65,11 +65,12 @@ Implement for asynchronous execution. Register **one** implementation per `<TCom
 public class CommandMediator(IServiceScopeFactory scopeFactory)
 {
     public DataOutput<TOutput?>       ExecuteCommand     <TCommand, TOutput>(TCommand command) ...
-    public Task<DataOutput<TOutput?>> ExecuteCommandAsync<TCommand, TOutput>(TCommand command) ...
+    public Task<DataOutput<TOutput?>> ExecuteCommandAsync<TCommand, TOutput>(TCommand command,
+                                          CancellationToken cancellationToken = default) ...
 }
 ```
 
-For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope. This ensures scoped dependencies (e.g. `DbContext`) are isolated per command execution.
+For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope — asynchronously on the asynchronous methods, so a handler can depend on a scoped service that only implements `IAsyncDisposable`. This ensures scoped dependencies (e.g. `DbContext`) are isolated per command execution. The asynchronous method forwards the token to the handler, and an already-canceled token throws `OperationCanceledException` before the scope is created. A null command throws `ArgumentNullException` before the scope is created.
 
 ---
 
@@ -151,7 +152,7 @@ sequenceDiagram
     participant DI as DI Container (scope)
     participant Handler as ICommandHandlerAsync
 
-    Caller->>CommandMediator: ExecuteCommandAsync<TCommand, TOutput>(command)
+    Caller->>CommandMediator: ExecuteCommandAsync<TCommand, TOutput>(command, ct)
     CommandMediator->>DI: CreateScope()
     CommandMediator->>DI: GetRequiredService<ICommandHandlerAsync<TCommand, TOutput>>()
     DI-->>CommandMediator: handler
