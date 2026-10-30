@@ -1,16 +1,8 @@
 # Command Mediator
 
-> [!NOTE]
-> This is the real, open-source code of dotnet-mediator. Its home is Forgejo, at
-> https://git.techcraftsmen.net/artur-rios/dotnet-mediator; the copy on GitHub is a read-only mirror, for viewing only, and
-> its issues and pull requests are not followed. If you want to contribute, email me at
-> arturdev@duck.com.
-
 [![Docs](https://img.shields.io/badge/docs-website-blue)](https://docs.artur-rios.tech/dotnet-mediator)
 [![License: Attribution](https://img.shields.io/badge/License-Attribution-blue.svg)](https://github.com/artur-rios/dotnet-mediator/blob/main/LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/ArturRios.Mediator.svg)](https://www.nuget.org/packages/ArturRios.Mediator)
-
-This repository lives at <https://git.techcraftsmen.net/artur-rios/dotnet-mediator>. The GitHub repository is a read-only mirror of it.
 
 `ArturRios.Mediator` is a lightweight .NET library that implements the [Mediator pattern](https://refactoring.guru/design-patterns/mediator) on top of the built-in dependency injection container, providing a clean CQRS-style separation between **commands** (write operations) and **queries** (read operations).
 
@@ -116,6 +108,9 @@ Notable changes in each release are recorded in [CHANGELOG.md](https://github.co
 
 Building from source, running the tests, the branching model and the release process are described in
 [CONTRIBUTING.md](https://github.com/artur-rios/dotnet-mediator/blob/main/CONTRIBUTING.md).
+
+The GitHub repository is a read-only mirror for the real, open-source code of dotnet-mediator. Its home is Forgejo, at
+https://git.techcraftsmen.net/artur-rios/dotnet-mediator. If you want to contribute, e-mail me at arturdev@duck.com.
 
 ## Legal Details
 
