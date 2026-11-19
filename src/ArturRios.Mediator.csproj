@@ -18,13 +18,13 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>dotnet;mediator;cqrs;command;query</PackageTags>
     <RepositoryUrl>https://github.com/artur-rios/dotnet-mediator</RepositoryUrl>
-    <Version>2.0.3</Version>
+    <Version>2.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="" />
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ArturRios.Output" Version="3.3.2" />
+    <PackageReference Include="ArturRios.Output" Version="3.3.3" />
   </ItemGroup>
 </Project>
