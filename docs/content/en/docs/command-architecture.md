@@ -70,7 +70,7 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
 }
 ```
 
-For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope — asynchronously on the asynchronous methods, so a handler can depend on a scoped service that only implements `IAsyncDisposable`. This ensures scoped dependencies (e.g. `DbContext`) are isolated per command execution. The asynchronous method forwards the token to the handler, and an already-canceled token throws `OperationCanceledException` before the scope is created. A null command throws `ArgumentNullException` before the scope is created.
+For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope — asynchronously on the asynchronous methods, so a handler can depend on a scoped service that only implements `IAsyncDisposable`. The synchronous methods dispose it synchronously, which throws `InvalidOperationException` for such a service after the handler has run, losing its result: use the asynchronous method for that handler. This ensures scoped dependencies (e.g. `DbContext`) are isolated per command execution. The asynchronous method forwards the token to the handler, and an already-canceled token throws `OperationCanceledException` before the scope is created. A null command throws `ArgumentNullException` before the scope is created.
 
 ---
 

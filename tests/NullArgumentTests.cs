@@ -53,7 +53,7 @@ public class NullArgumentTests
         var mediator = BuildMediator();
 
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            mediator.ExecuteCommandAsync<EchoCommand, EchoCommandOutput>(null!));
+            mediator.ExecuteCommandAsync<EchoCommand, EchoCommandOutput>(null!, TestContext.Current.CancellationToken));
 
         Assert.Equal("command", exception.ParamName);
         Assert.False(_commandHandlerAsync.WasCalled);
@@ -77,7 +77,7 @@ public class NullArgumentTests
         var mediator = BuildMediator();
 
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            mediator.ExecuteQueryAsync<SearchQuery, SearchQueryOutput>(null!));
+            mediator.ExecuteQueryAsync<SearchQuery, SearchQueryOutput>(null!, TestContext.Current.CancellationToken));
 
         Assert.Equal("query", exception.ParamName);
         Assert.False(_queryHandlerAsync.WasCalled);
@@ -101,9 +101,50 @@ public class NullArgumentTests
         var mediator = BuildMediator();
 
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            mediator.ExecutePaginatedQueryAsync<SearchQuery, SearchQueryOutput>(null!));
+            mediator.ExecutePaginatedQueryAsync<SearchQuery, SearchQueryOutput>(
+                null!, TestContext.Current.CancellationToken));
 
         Assert.Equal("query", exception.ParamName);
         Assert.False(_paginatedHandlerAsync.WasCalled);
+    }
+
+    [Theory]
+    [MemberData(nameof(Dispatch.All), MemberType = typeof(Dispatch))]
+    public async Task GivenANullRequest_WhenDispatched_ThenNoScopeIsCreated(DispatchKind kind)
+    {
+        await using var provider = new ProbeBehaviour().BuildProvider();
+
+        var counting = new CountingScopeFactory(provider.GetRequiredService<IServiceScopeFactory>());
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            Dispatch.Run(new CommandQueryMediator(counting), kind, null, TestContext.Current.CancellationToken));
+
+        Assert.Equal(0, counting.ScopesCreated);
+    }
+
+    [Theory]
+    [MemberData(nameof(Dispatch.All), MemberType = typeof(Dispatch))]
+    public async Task GivenANullRequestAndNoHandler_WhenDispatched_ThenTheNullIsReportedRatherThanTheMissingHandler(
+        DispatchKind kind)
+    {
+        await using var provider = new ServiceCollection().BuildServiceProvider();
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            Dispatch.Run(new CommandQueryMediator(provider.GetRequiredService<IServiceScopeFactory>()), kind, null,
+                TestContext.Current.CancellationToken));
+    }
+
+    [Theory]
+    [MemberData(nameof(Dispatch.Asynchronous), MemberType = typeof(Dispatch))]
+    public async Task GivenANullRequestAndACancelledToken_WhenDispatched_ThenTheNullIsReportedFirst(DispatchKind kind)
+    {
+        await using var provider = new ProbeBehaviour().BuildProvider();
+
+        using var cancellation = new CancellationTokenSource();
+
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            Dispatch.Run(provider.GetRequiredService<CommandQueryMediator>(), kind, null, cancellation.Token));
     }
 }

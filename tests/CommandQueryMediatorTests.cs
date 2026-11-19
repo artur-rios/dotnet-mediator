@@ -34,7 +34,8 @@ public class CommandQueryMediatorTests
         services.AddSingleton<ICommandHandlerAsync<EchoCommand, EchoCommandOutput>>(handler);
         var mediator = BuildMediator(services.BuildServiceProvider());
 
-        var result = await mediator.ExecuteCommandAsync<EchoCommand, EchoCommandOutput>(new EchoCommand { Value = "cmd" });
+        var result = await mediator.ExecuteCommandAsync<EchoCommand, EchoCommandOutput>(
+            new EchoCommand { Value = "cmd" }, TestContext.Current.CancellationToken);
 
         Assert.True(handler.WasCalled);
         Assert.Equal("cmd", result.Data!.Value);
@@ -62,7 +63,8 @@ public class CommandQueryMediatorTests
         services.AddSingleton<IQueryHandlerAsync<SearchQuery, SearchQueryOutput>>(handler);
         var mediator = BuildMediator(services.BuildServiceProvider());
 
-        var result = await mediator.ExecuteQueryAsync<SearchQuery, SearchQueryOutput>(new SearchQuery { Term = "qry" });
+        var result = await mediator.ExecuteQueryAsync<SearchQuery, SearchQueryOutput>(
+            new SearchQuery { Term = "qry" }, TestContext.Current.CancellationToken);
 
         Assert.True(handler.WasCalled);
         Assert.Equal("qry", result.Data!.Value);
@@ -92,11 +94,27 @@ public class CommandQueryMediatorTests
         services.AddSingleton<IPaginatedQueryHandlerAsync<SearchQuery, SearchQueryOutput>>(handler);
         var mediator = BuildMediator(services.BuildServiceProvider());
 
-        var result = await mediator.ExecutePaginatedQueryAsync<SearchQuery, SearchQueryOutput>(new SearchQuery { Term = "qry" });
+        var result = await mediator.ExecutePaginatedQueryAsync<SearchQuery, SearchQueryOutput>(
+            new SearchQuery { Term = "qry" }, TestContext.Current.CancellationToken);
 
         Assert.True(handler.WasCalled);
         Assert.NotNull(result.Data);
         Assert.Single(result.Data);
         Assert.Equal("qry", result.Data[0].Value);
+    }
+
+    [Theory]
+    [MemberData(nameof(Dispatch.All), MemberType = typeof(Dispatch))]
+    public async Task GivenNoRegisteredHandler_WhenDispatched_ThenTheInvalidOperationNamesTheMissingHandler(DispatchKind kind)
+    {
+        await using var provider = new ServiceCollection().BuildServiceProvider();
+        var mediator = BuildMediator(provider);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Dispatch.Run(mediator, kind, "x", TestContext.Current.CancellationToken));
+
+        // The generic type's name with its arity (IQueryHandler`2), so IQueryHandler is not matched by
+        // IQueryHandlerAsync.
+        Assert.Contains($"{Dispatch.HandlerInterface(kind).Name}[", exception.Message);
     }
 }

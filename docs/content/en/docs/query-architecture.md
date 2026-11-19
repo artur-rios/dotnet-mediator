@@ -93,7 +93,7 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
 }
 ```
 
-For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope — asynchronously on the asynchronous methods, so a handler can depend on a scoped service that only implements `IAsyncDisposable`. The asynchronous methods forward the token to the handler, and an already-canceled token throws `OperationCanceledException` before the scope is created. A null query throws `ArgumentNullException` before the scope is created.
+For each call the mediator creates a new DI scope, resolves the matching handler, invokes it, and disposes the scope — asynchronously on the asynchronous methods, so a handler can depend on a scoped service that only implements `IAsyncDisposable`. The synchronous methods dispose it synchronously, which throws `InvalidOperationException` for such a service after the handler has run, losing its result: use the asynchronous method for that handler. The asynchronous methods forward the token to the handler, and an already-canceled token throws `OperationCanceledException` before the scope is created. A null query throws `ArgumentNullException` before the scope is created.
 
 ---
 

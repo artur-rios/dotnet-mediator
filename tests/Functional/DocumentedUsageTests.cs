@@ -175,7 +175,7 @@ public class DocumentedUsageTests
         var mediator = provider.GetRequiredService<CommandQueryMediator>();
 
         var result = await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
-            new CreateProductCommand { Name = "Widget", Price = 9.99m });
+            new CreateProductCommand { Name = "Widget", Price = 9.99m }, TestContext.Current.CancellationToken);
 
         Assert.True(result.Success);
         Assert.NotNull(result.Data);
@@ -190,10 +190,10 @@ public class DocumentedUsageTests
         var mediator = provider.GetRequiredService<CommandQueryMediator>();
 
         var created = await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
-            new CreateProductCommand { Name = "Widget", Price = 9.99m });
+            new CreateProductCommand { Name = "Widget", Price = 9.99m }, TestContext.Current.CancellationToken);
 
         var found = await mediator.ExecuteQueryAsync<GetProductQuery, GetProductOutput>(
-            new GetProductQuery { Id = created.Data!.Id });
+            new GetProductQuery { Id = created.Data!.Id }, TestContext.Current.CancellationToken);
 
         Assert.True(found.Success);
         Assert.Equal("Widget", found.Data!.Name);
@@ -208,7 +208,7 @@ public class DocumentedUsageTests
         var mediator = provider.GetRequiredService<CommandQueryMediator>();
 
         var found = await mediator.ExecuteQueryAsync<GetProductQuery, GetProductOutput>(
-            new GetProductQuery { Id = Guid.NewGuid() });
+            new GetProductQuery { Id = Guid.NewGuid() }, TestContext.Current.CancellationToken);
 
         Assert.False(found.Success);
         Assert.Contains("Product not found.", found.Errors);
@@ -225,11 +225,13 @@ public class DocumentedUsageTests
         foreach (var index in Enumerable.Range(1, 25))
         {
             await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
-                new CreateProductCommand { Name = $"Widget {index:D2}", Price = index });
+                new CreateProductCommand { Name = $"Widget {index:D2}", Price = index },
+                TestContext.Current.CancellationToken);
         }
 
         var page = await mediator.ExecutePaginatedQueryAsync<ListProductsQuery, ProductListItem>(
-            new ListProductsQuery { NameFilter = "Widget", PageNumber = 2, PageSize = 20 });
+            new ListProductsQuery { NameFilter = "Widget", PageNumber = 2, PageSize = 20 },
+            TestContext.Current.CancellationToken);
 
         Assert.True(page.Success);
         Assert.NotNull(page.Data);
@@ -248,7 +250,8 @@ public class DocumentedUsageTests
         var mediator = provider.GetRequiredService<CommandQueryMediator>();
 
         var page = await mediator.ExecutePaginatedQueryAsync<ListProductsQuery, ProductListItem>(
-            new ListProductsQuery { NameFilter = "nothing", PageNumber = 1, PageSize = 20 });
+            new ListProductsQuery { NameFilter = "nothing", PageNumber = 1, PageSize = 20 },
+            TestContext.Current.CancellationToken);
 
         Assert.True(page.Success);
         Assert.NotNull(page.Data);
@@ -265,10 +268,10 @@ public class DocumentedUsageTests
         var mediator = provider.GetRequiredService<CommandQueryMediator>();
 
         await mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
-            new CreateProductCommand { Name = "Widget", Price = 1m });
+            new CreateProductCommand { Name = "Widget", Price = 1m }, TestContext.Current.CancellationToken);
 
         var page = await mediator.ExecutePaginatedQueryAsync<ListProductsQuery, ProductListItem>(
-            new ListProductsQuery());
+            new ListProductsQuery(), TestContext.Current.CancellationToken);
 
         Assert.Equal(1, page.PageNumber);
         Assert.Equal(100, page.PageSize);
@@ -286,7 +289,8 @@ public class DocumentedUsageTests
         var mediator = provider.GetRequiredService<CommandQueryMediator>();
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(new CreateProductCommand()));
+            () => mediator.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
+                new CreateProductCommand(), TestContext.Current.CancellationToken));
 
         Assert.Contains(nameof(ICommandHandlerAsync<CreateProductCommand, CreateProductOutput>), exception.Message);
     }
@@ -300,10 +304,10 @@ public class DocumentedUsageTests
         var queries = provider.GetRequiredService<QueryMediator>();
 
         var created = await commands.ExecuteCommandAsync<CreateProductCommand, CreateProductOutput>(
-            new CreateProductCommand { Name = "Widget", Price = 5m });
+            new CreateProductCommand { Name = "Widget", Price = 5m }, TestContext.Current.CancellationToken);
 
         var found = await queries.ExecuteQueryAsync<GetProductQuery, GetProductOutput>(
-            new GetProductQuery { Id = created.Data!.Id });
+            new GetProductQuery { Id = created.Data!.Id }, TestContext.Current.CancellationToken);
 
         Assert.True(found.Success);
         Assert.Equal("Widget", found.Data!.Name);

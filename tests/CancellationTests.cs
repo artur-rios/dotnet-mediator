@@ -31,18 +31,6 @@ public class CancellationTests
         return services.BuildServiceProvider();
     }
 
-    private sealed class CountingScopeFactory(IServiceScopeFactory inner) : IServiceScopeFactory
-    {
-        public int ScopesCreated { get; private set; }
-
-        public IServiceScope CreateScope()
-        {
-            ScopesCreated++;
-
-            return inner.CreateScope();
-        }
-    }
-
     [Fact]
     public async Task GivenAToken_WhenACommandIsDispatched_ThenTheHandlerReceivesIt()
     {
@@ -149,23 +137,54 @@ public class CancellationTests
         Assert.False(handler.WasCalled);
     }
 
-    [Fact]
-    public async Task GivenACancelledToken_WhenACommandIsDispatched_ThenNoScopeIsCreated()
+    [Theory]
+    [MemberData(nameof(Dispatch.Asynchronous), MemberType = typeof(Dispatch))]
+    public async Task GivenACancelledToken_WhenDispatched_ThenNoScopeIsCreated(DispatchKind kind)
     {
-        await using var provider = BuildProvider(services =>
-            services.AddSingleton<ICommandHandlerAsync<EchoCommand, EchoCommandOutput>>(new EchoCommandHandlerAsync()));
+        await using var provider = new ProbeBehaviour().BuildProvider();
 
         var counting = new CountingScopeFactory(provider.GetRequiredService<IServiceScopeFactory>());
-        var mediator = new CommandMediator(counting);
+        var mediator = new CommandQueryMediator(counting);
 
         using var cancellation = new CancellationTokenSource();
 
         await cancellation.CancelAsync();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
-            mediator.ExecuteCommandAsync<EchoCommand, EchoCommandOutput>(new EchoCommand { Value = "x" }, cancellation.Token));
+            Dispatch.Run(mediator, kind, "x", cancellation.Token));
 
         Assert.Equal(0, counting.ScopesCreated);
+    }
+
+    [Theory]
+    [MemberData(nameof(Dispatch.Asynchronous), MemberType = typeof(Dispatch))]
+    public async Task GivenATokenCancelledWhileTheHandlerRuns_WhenDispatched_ThenTheCancellationReachesTheCallerAndTheScopeIsDisposed(
+        DispatchKind kind)
+    {
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var behaviour = new ProbeBehaviour
+        {
+            // Waits for nothing but the token: the handler only finishes when the dispatch is cancelled.
+            OnHandleAsync = async (_, cancellationToken) =>
+            {
+                started.SetResult();
+
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+            }
+        };
+        await using var provider = behaviour.BuildProvider();
+
+        using var cancellation = new CancellationTokenSource();
+
+        var dispatch = Dispatch.Run(provider.GetRequiredService<CommandQueryMediator>(), kind, "x", cancellation.Token);
+
+        await started.Task.WaitAsync(TestContext.Current.CancellationToken);
+        await cancellation.CancelAsync();
+
+        var exception = await Assert.ThrowsAnyAsync<OperationCanceledException>(() => dispatch);
+
+        Assert.Equal(cancellation.Token, exception.CancellationToken);
+        Assert.True(Assert.Single(behaviour.Created).DisposedAsynchronously);
     }
 
     [Fact]
@@ -176,8 +195,11 @@ public class CancellationTests
         await using var provider = BuildProvider(services =>
             services.AddSingleton<ICommandHandlerAsync<EchoCommand, EchoCommandOutput>>(handler));
 
+        // The point of the test is the call without a token, so the test's own token is not passed.
+#pragma warning disable xUnit1051
         await provider.GetRequiredService<CommandQueryMediator>()
             .ExecuteCommandAsync<EchoCommand, EchoCommandOutput>(new EchoCommand { Value = "x" });
+#pragma warning restore xUnit1051
 
         Assert.Equal(CancellationToken.None, handler.ReceivedToken);
         Assert.True(handler.WasCalled);

@@ -31,6 +31,11 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// Thrown when no <see cref="IPaginatedQueryHandler{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
     /// </exception>
+    /// <remarks>
+    /// The scope is disposed synchronously, so a handler must not depend on a scoped service that only implements
+    /// <see cref="IAsyncDisposable"/>: disposing the scope throws <see cref="InvalidOperationException"/> after the
+    /// handler has run, and its result is lost. Use the asynchronous method for such a handler.
+    /// </remarks>
     public PaginatedOutput<TOutput> ExecutePaginatedQuery<TQuery, TOutput>(TQuery query)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
@@ -94,6 +99,11 @@ public class QueryMediator(IServiceScopeFactory scopeFactory)
     /// Thrown when no <see cref="IQueryHandler{TQuery, TOutput}"/> is registered for the
     /// requested query and output types.
     /// </exception>
+    /// <remarks>
+    /// The scope is disposed synchronously, so a handler must not depend on a scoped service that only implements
+    /// <see cref="IAsyncDisposable"/>: disposing the scope throws <see cref="InvalidOperationException"/> after the
+    /// handler has run, and its result is lost. Use the asynchronous method for such a handler.
+    /// </remarks>
     public DataOutput<TOutput?> ExecuteQuery<TQuery, TOutput>(TQuery query)
         where TQuery : BaseQuery
         where TOutput : QueryOutput
