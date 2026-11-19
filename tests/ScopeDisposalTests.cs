@@ -250,4 +250,39 @@ public class ScopeDisposalTests
         Assert.All(behaviour.Created, resource => Assert.True(resource.DisposedAsynchronously));
         Assert.All(behaviour.LiveDuringHandle, Assert.True);
     }
+
+    private sealed class SyncCommandHandlerUsingAsyncResource(AsyncOnlyResource resource)
+        : ICommandHandler<EchoCommand, EchoCommandOutput>
+    {
+        public DataOutput<EchoCommandOutput?> Handle(EchoCommand command)
+        {
+            Assert.False(resource.Disposed);
+
+            return DataOutput<EchoCommandOutput?>.New.WithData(new EchoCommandOutput { Value = command.Value });
+        }
+    }
+
+    // What the synchronous methods document: they cannot dispose such a scope, and the handler has run by then.
+    [Fact]
+    public async Task GivenASyncHandlerWithAnAsyncOnlyDisposableDependency_WhenACommandIsDispatchedSynchronously_ThenDisposingTheScopeThrows()
+    {
+        var created = new List<AsyncOnlyResource>();
+        var services = new ServiceCollection();
+        services.AddSingleton<CommandQueryMediator>();
+        services.AddScoped(_ =>
+        {
+            var resource = new AsyncOnlyResource();
+            created.Add(resource);
+
+            return resource;
+        });
+        services.AddScoped<ICommandHandler<EchoCommand, EchoCommandOutput>, SyncCommandHandlerUsingAsyncResource>();
+        await using var provider = services.BuildServiceProvider();
+
+        var exception = Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<CommandQueryMediator>()
+            .ExecuteCommand<EchoCommand, EchoCommandOutput>(new EchoCommand { Value = "x" }));
+
+        Assert.Contains(nameof(IAsyncDisposable), exception.Message);
+        Assert.Single(created);
+    }
 }

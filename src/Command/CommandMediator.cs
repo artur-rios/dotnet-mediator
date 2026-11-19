@@ -31,6 +31,11 @@ public class CommandMediator(IServiceScopeFactory scopeFactory)
     /// Thrown when no <see cref="ICommandHandler{TCommand, TOutput}"/> is registered for the
     /// requested command and output types.
     /// </exception>
+    /// <remarks>
+    /// The scope is disposed synchronously, so a handler must not depend on a scoped service that only implements
+    /// <see cref="IAsyncDisposable"/>: disposing the scope throws <see cref="InvalidOperationException"/> after the
+    /// handler has run, and its result is lost. Use the asynchronous method for such a handler.
+    /// </remarks>
     public DataOutput<TOutput?> ExecuteCommand<TCommand, TOutput>(TCommand command)
         where TCommand : BaseCommand
         where TOutput : CommandOutput

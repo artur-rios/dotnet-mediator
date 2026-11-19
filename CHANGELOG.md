@@ -7,6 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- `ArturRios.Output` updated from 3.3.1 to 3.3.2.
+
+### Fixed
+
+- The synchronous `ExecuteCommand`, `ExecuteQuery` and `ExecutePaginatedQuery` document that they dispose the scope
+  synchronously, so a handler with a scoped dependency that only implements `IAsyncDisposable` throws
+  `InvalidOperationException` after it has run and loses its result; the asynchronous methods handle it.
+
 ## [2.0.2] - 2026-11-14
 
 ### Changed
